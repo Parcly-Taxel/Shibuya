@@ -64,3 +64,26 @@ def ring_edges(n, triples):
         limit = k if a == b and 2*k == n else n
         L.extend([(i+a*n, (i+k)%n + b*n) for i in range(limit)])
     return L
+
+def all_unit_distances(vertices):
+    """Returns the graph formed by inserting all edges of length 1 between the vertices."""
+    n = len(vertices)
+    edges = []
+    for i in range(n):
+        for j in range(i+1, n):
+            if almosteq(abs(vertices[i]-vertices[j]), 1):
+                edges.append((i, j))
+    return (vertices, edges)
+
+def delete_vertices(graph, dverts):
+    """Delete the vertices indexed by dverts from graph; return the resulting graph."""
+    vertices, edges = graph
+    remverts = list(filter(lambda x: x not in dverts, range(len(vertices))))
+    vmap = {v: n for (n, v) in enumerate(remverts)}
+    nvertices = list(map(vertices.__getitem__, remverts))
+    nedges = []
+    for (a, b) in edges:
+        if a in dverts or b in dverts:
+            continue
+        nedges.append((vmap[a], vmap[b]))
+    return (nvertices, tuple(nedges))
