@@ -64,7 +64,7 @@ def genpetersen(n=5, k=2):
         n, k = named_gp[n]
     return igraph(n, 1, k)
 
-# Most of the following embeddings were taken from MathWorld
+# The following embeddings are of cubic symmetric graphs. Most of them are taken from MathWorld.
 
 def pappus():
     """Return a unit-distance embedding of the Pappus graph (F18A)."""
@@ -115,4 +115,37 @@ def tutte8():
     vertices = tutte8_vertices(x0)[0]
     edges = ring_edges(5, ((0, 2, 1), (0, 2, 3), (0, 3, 2), (1, 3, 4), (1, 4, 1), (1, 4, 2),
                            (2, 5, 0), (3, 5, 0), (4, 5, 0)))
+    return (vertices, edges)
+
+def dyck():
+    """Return a unit-distance embedding of the Dyck graph (F32A)."""
+    r0 = unitroots(8)
+    r1 = [sqrt(2)*u for u in r0]
+    z2 = cu(r0[1], 0, 1, star_radius(8))
+    r2 = [z2*u for u in r0]
+    z3 = cu(0, r1[0], star_radius(8, 3), 1)
+    r3 = [z3*u for u in r0]
+    vertices = r0 + r1 + r2 + r3
+    edges = ring_edges(8, ((0, 1, 1), (0, 1, -1), (0, 2, -1), (2, 2, 1), (1, 3, 0), (3, 3, 3)))
+    return (vertices, edges)
+
+def biggssmith():
+    """Return a unit-distance embedding of the Biggs–Smith graph (F102A)."""
+    s1 = star_radius(17)
+    s2 = star_radius(17, 2)
+    s4 = star_radius(17, 4)
+    s8 = star_radius(17, 8)
+    u17 = unitroots(17)
+    r1 = [s1*u*1j for u in u17]
+    r4 = [s4*u*1j for u in u17]
+    r8 = [s8*u*-1j for u in u17]
+    sh1 = cu(r1[0], r4[0])
+    rh1 = [sh1*u for u in u17]
+    sh2 = cu(sh1, r8[7])
+    rh2 = [sh2*u for u in u17]
+    s2 = cu(sh2, 0, 1, s2)
+    r2 = [s2*u for u in u17]
+    vertices = r1 + r4 + rh1 + r8 + rh2 + r2
+    edges = ring_edges(17, ((0, 0, 1), (1, 1, 4), (3, 3, 8), (5, 5, 2),
+                            (0, 2, 0), (1, 2, 0), (2, 4, 0), (4, 5, 0), (4, 3, 7)))
     return (vertices, edges)

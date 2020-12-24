@@ -1,3 +1,7 @@
+"""
+Functions to draw graphs with a distinctly circular layout.
+They are not always unit-distance or integral, obviously.
+"""
 from mpmath import unitroots
 from shibuya.generators import star_radius, ring_edges
 
