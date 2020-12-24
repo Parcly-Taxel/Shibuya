@@ -2,8 +2,8 @@
 Functions to draw graphs with a distinctly circular layout.
 They are not always unit-distance or integral, obviously.
 """
-from mpmath import unitroots
-from shibuya.generators import star_radius, ring_edges
+from mpmath import root, unitroots
+from shibuya.generators import star_radius, ring_edges, cartesian_product
 
 def circulant(n, taps):
     """Return the circulant graph on n vertices with offsets given by taps.
@@ -26,3 +26,12 @@ def mobiusladder(n=3):
     to the utility graph; its embedding returned by this function is integral
     with edge lengths 1 and 2, as well as rigid, but not first-order rigid."""
     return circulant(2*n, (1, n))
+
+def hamming(d, q):
+    """Return the Hamming graph H(d, q), the Cartesian product of d copies of K_q.
+    H(d, 2) is the hypercube graph Q_d. H(d, 2) and H(d, 3) are unit-distance
+    (and are rendered in such a fashion by this function), but have d-1 degrees
+    of freedom."""
+    verts, edges = complete(q)
+    vgroups = [[v * root(1, d*q, a) for v in verts] for a in range(d)]
+    return cartesian_product(*((vs, edges) for vs in vgroups))

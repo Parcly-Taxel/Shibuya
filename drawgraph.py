@@ -22,18 +22,6 @@ def subtend_r(p, q):
     p/q of a full rotation. This is used to precisely place points on a star of edges."""
     return sqrt(0.5 / (1 - cospi(2 * mpf(p) / mpf(q))))
 
-@extradps(50)
-def newton(pol_list, x0):
-    """Uses Newton's method to find a root of the polynomial given by pol_list,
-    where the highest-degree term is first. Starts from x0.
-    This is used when mpmath's polyroots fails to find the desired root."""
-    delta, x = 1, mpf(x0)
-    while abs(delta) > mpf(f"1e-{mp.dps - 30}"):
-        p_at, d_at = polyval(pol_list, x, True)
-        delta = p_at / d_at
-        x -= delta
-    return x
-
 def ring_edges(N, triples):
     """Suppose the vertices are grouped into some number of rings, each ring having N vertices.
     Those vertices can then be grouped into N congruent units.

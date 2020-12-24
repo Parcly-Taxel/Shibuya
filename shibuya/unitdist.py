@@ -1,7 +1,7 @@
 """
 Other unit-distance graphs...
 """
-from mpmath import mpc, sqrt, root, unitroots
+from mpmath import mpc, sqrt, root, unitroots, polyroots
 from shibuya.generators import cu, star_radius, ring_edges
 
 def tietze():
@@ -32,4 +32,32 @@ def flowersnark(n=5):
     r3 = [z3*u for u in un]
     vertices = r0 + r1 + r2 + r3
     edges = ring_edges(n, ((1, 0, 1), (1, 0, -1), (0, 2, 0), (1, 2, 0), (2, 3, 0), (3, 3, 1)))
+    return (vertices, edges)
+
+def blanusa2():
+    """Draws a unit-distance embedding of the second Blanuša snark."""
+    u4 = unitroots(4)
+    v1 = [u/2 for u in u4]
+    v2_s = cu(v1[1], v1[0])
+    v2 = [v2_s*u for u in u4]
+    vertices1 = v1 + v2
+    edges1 = [(0, 2), (1, 3), (0, 4), (4, 1), (1, 5), (5, 2), (2, 6), (6, 3), (3, 7), (7, 0)]
+    tvec = mpc(sqrt(111), 15) / sqrt(336)
+    vertices2 = [v + tvec for v in vertices1]
+    edges2 = [(a + 8, b + 8) for (a, b) in edges1]
+    vertices = vertices1 + vertices2
+    va = cu(vertices[4], vertices[12])
+    vb = cu(vertices[13], vertices[5])
+    vertices.extend([va, vb])
+    edges = edges1 + edges2 + [(6, 14), (7, 15), (4, 16), (12, 16), (5, 17), (13, 17), (16, 17)]
+    return (vertices, edges)
+
+def franklin():
+    """Return a unit-distance embedding of the Franklin graph."""
+    s2 = polyroots([9, -15, 16, -15, 9])[1]
+    s3 = sqrt(3) * 1j
+    s1 = cu(s2, s3)
+    third = [v - s3/3 for v in (s3, s1, s2, 0)]
+    vertices = [v*u for v in third for u in unitroots(3)]
+    edges = ring_edges(3, ((0, 1, 0), (0, 3, 1), (0, 3, -1), (1, 2, 0), (1, 2, -1), (2, 3, 0)))
     return (vertices, edges)
