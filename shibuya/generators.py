@@ -61,5 +61,6 @@ def ring_edges(n, triples):
     Return all the edges implied by these statements."""
     L = []
     for (a, b, k) in triples:
-        L.extend([(i+a*n, (i+k)%n + b*n) for i in range(n)])
+        limit = k if a == b and 2*k == n else n
+        L.extend([(i+a*n, (i+k)%n + b*n) for i in range(limit)])
     return L

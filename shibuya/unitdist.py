@@ -2,21 +2,6 @@ from math import gcd
 from mpmath import root, unitroots
 from shibuya.generators import *
 
-def utility():
-    """Returns the minimal integral embedding of K_{3,3} with maximum edge length 2.
-    This graph is rigid, but not first-order/infinitesimally rigid."""
-    vertices = unitroots(6)
-    edges = ((0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 0), (0, 3), (1, 4), (2, 5))
-    return (vertices, edges)
-
-def dodecahedron():
-    r1 = star_radius(10)
-    r2 = star_radius(10, 2)
-    z2 = cu(0, r1, r2, 1)
-    vertices = [r1*u for u in unitroots(10)] + [z2*u for u in unitroots(10)]
-    edges = ring_edges(10, ((0, 0, 1), (1, 1, 2), (0, 1, 0)))
-    return (vertices, edges)
-
 def igraph(n, j, k):
     """Return a unit-distance embedding of the I-graph (n,j,k), either directly
     or through an isomorph. Based on Žitnik, Horvat and Pisanski (2010),
@@ -78,3 +63,56 @@ def genpetersen(n=5, k=2):
     if type(n) == str:
         n, k = named_gp[n]
     return igraph(n, 1, k)
+
+# Most of the following embeddings were taken from MathWorld
+
+def pappus():
+    """Return a unit-distance embedding of the Pappus graph (F18A)."""
+    u6 = unitroots(6)
+    r0 = [u*0.5j for u in u6]
+    z1 = cu(r0[2], r0[0])
+    r1 = [z1*u for u in u6]
+    z2 = cu(0, z1)
+    r2 = [z2*u for u in u6]
+    vertices = r0 + r1 + r2
+    edges = ring_edges(6, ((0, 0, 3), (0, 1, 0), (0, 1, -2), (2, 2, 1), (1, 2, 0)))
+    return (vertices, edges)
+
+def coxeter():
+    """Return a unit-distance embedding of the Coxeter graph (F28A)."""
+    u7 = unitroots(7)
+    s1 = star_radius(7)
+    s2 = star_radius(7, 2)
+    s3 = star_radius(7, 3)
+    r0 = [-s2*u for u in u7]
+    r1 = [s3*u for u in u7]
+    z2 = cu(r0[0], r1[3])
+    r2 = [z2*u for u in u7]
+    z3 = cu(0, z2, s1, 1)
+    r3 = [z3*u for u in u7]
+    vertices = r0 + r1 + r2 + r3
+    edges = ring_edges(7, ((0, 0, 2), (1, 1, 3), (3, 3, 1), (0, 2, 0), (1, 2, -3), (2, 3, 0)))
+    return (vertices, edges)
+
+def tutte8_vertices(x):
+    u5 = unitroots(5)
+    r0 = [u*0.25j for u in u5]
+    r1 = [-u*x*1j for u in u5]
+    z2 = cu(r0[2], r0[4])
+    r2 = [z2*u for u in u5]
+    z3 = cu(r0[3], r1[1])
+    r3 = [z3*u for u in u5]
+    z4 = cu(r1[4], r1[3])
+    r4 = [z4*u for u in u5]
+    z5 = cu(r3[0], r2[0])
+    r5 = [z5*u for u in u5]
+    return (r0 + r1 + r2 + r3 + r4 + r5, abs(z4-z5)-1)
+
+def tutte8():
+    """Return a unit-distance embedding of the Tutte 8-cage (F30A; MathWorld calls this
+    the Levi graph)."""
+    x0 = findroot(lambda x: tutte8_vertices(x)[1], [0.33, 0.34])
+    vertices = tutte8_vertices(x0)[0]
+    edges = ring_edges(5, ((0, 2, 1), (0, 2, 3), (0, 3, 2), (1, 3, 4), (1, 4, 1), (1, 4, 2),
+                           (2, 5, 0), (3, 5, 0), (4, 5, 0)))
+    return (vertices, edges)
