@@ -1,7 +1,7 @@
 """
 Cubic symmetric graphs. Most of the embeddings realised here were taken from MathWorld.
 """
-from mpmath import mp, mpc, sqrt, findroot, unitroots, polyval, extradps, ldexp
+from mpmath import mp, mpc, sqrt, root, findroot, unitroots, polyval, extradps, ldexp
 from shibuya.generators import cu, star_radius, ring_edges
 
 def pappus():
@@ -65,6 +65,28 @@ def dyck():
     r3 = [z3*u for u in r0]
     vertices = r0 + r1 + r2 + r3
     edges = ring_edges(8, ((0, 1, 1), (0, 1, -1), (0, 2, -1), (2, 2, 1), (1, 3, 0), (3, 3, 3)))
+    return (vertices, edges)
+
+def foster_vertices(r):
+    v3a = 0.265
+    v3 = v3a * root(1, 5, 2)
+    v2 = cu(v3, v3a)
+    v5r = root(1, 20, 7) * r
+    v5r2 = -v5r.conjugate()
+    v5 = v5r * root(1, 15, 14)
+    v0 = cu(v5r, v5r2)
+    v1 = cu(v2, v0)
+    v4 = cu(v3, v5)
+    vgens = (v0, v1, v2, v3, v4, v5)
+    vertices = [v*u for v in vgens for u in unitroots(15)]
+    return (vertices, abs(v1 - v4*root(1, 15, 2)) - 1)
+
+def foster():
+    """Return a unit-distance embedding of the Foster graph (F90A)."""
+    r0 = findroot(lambda r: foster_vertices(r)[1], 0.35)
+    vertices = foster_vertices(r0)[0]
+    edges = ring_edges(15, ((0, 1, 0), (1, 2, 0), (2, 3, 0), (3, 4, 0), (4, 5, 0), (5, 0, -1),
+                            (0, 5, -2), (2, 3, -6), (4, 1, -2)))
     return (vertices, edges)
 
 def biggssmith():
