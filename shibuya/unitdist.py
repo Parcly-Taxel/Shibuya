@@ -1,7 +1,7 @@
 """
 Other unit-distance graphs...
 """
-from mpmath import mpc, chop, sqrt, root, unitroots, polyroots, extradps
+from mpmath import *
 from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances, delete_vertices
 
 def tietze():
@@ -107,3 +107,21 @@ def rigid_heptagon(suppress=None):
     if suppress == (3,3):
         return delete_vertices(G, (14, 17))
     return G
+
+def mcgee():
+    """Return a unit-distance embedding of the McGee graph.
+    From https://math.stackexchange.com/q/1484002/357390"""
+    u8 = unitroots(8)
+    r0 = [u/2 for u in u8[::2]]
+    r1 = [u/2 for u in u8[1::2]]
+    pol = [1024, -3072*(1+1j), 9984j, -10752*(-1+1j), -19968, 19584*(1+1j), -38656j, 30720*(-1+1j), 35676, -14220*(1+1j), 7425j, -1134*(-1+1j), -162]
+    z0 = polyroots(pol)[-1]
+    z1 = cu(z0, r0[0])
+    r2 = [z0*u for u in u8[::2]]
+    r3 = [z1*u for u in u8[::2]]
+    r4 = [z0.conjugate()*u for u in u8[::2]]
+    r5 = [z1.conjugate()*u for u in u8[::2]]
+    vertices = r0 + r1 + r2 + r3 + r4 + r5
+    edges = ring_edges(4, ((0, 0, 2), (1, 1, 2), (1, 2, 3), (1, 4, 2), (0, 3, 0), (0, 5, 0),
+                           (2, 3, 0), (2, 3, 1), (4, 5, 0), (4, 5, 3)))
+    return (vertices, edges)
