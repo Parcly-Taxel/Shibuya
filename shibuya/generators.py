@@ -65,13 +65,13 @@ def ring_edges(n, triples):
         L.extend([(i+a*n, (i+k)%n + b*n) for i in range(limit)])
     return L
 
-def all_unit_distances(vertices):
+def all_unit_distances(vertices, tol=1e-12):
     """Returns the graph formed by inserting all edges of length 1 between the vertices."""
     n = len(vertices)
     edges = []
     for i in range(n):
         for j in range(i+1, n):
-            if almosteq(abs(vertices[i]-vertices[j]), 1):
+            if almosteq(abs(vertices[i]-vertices[j]), 1, tol):
                 edges.append((i, j))
     return (vertices, edges)
 

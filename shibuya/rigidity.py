@@ -1,4 +1,4 @@
-from mpmath import re, im, zeros
+from mpmath import re, im, zeros, diff
 
 def rigidity_matrix(graph):
     """Return the rigidity matrix of the given graph.
@@ -13,3 +13,15 @@ def rigidity_matrix(graph):
         A[r,2*i2] = -dreal
         A[r,2*i2+1] = -dimag
     return A
+
+def jacobian(f, x0):
+    """Construct the Jacobian matrix of the (possibly multivariate)
+    function f at x0."""
+    n, m = len(x0), len(f(*x0))
+    J = zeros(m,n)
+    for i in range(m):
+        fi = lambda *x: f(*x)[i]
+        for j in range(n):
+            dvec = tuple(int(k == j) for k in range(n))
+            J[i,j] = diff(fi, x0, dvec)
+    return J
