@@ -156,3 +156,45 @@ def ei21(t0=0):
     w0 = findroot(f, [w_estimate-0.01, w_estimate+0.01])
     vertices = ei21_vertices(t0, u0, v0, w0)[0]
     return all_unit_distances(vertices)
+
+def hodfish_vertices(t, u, v, w, x):
+    A = 0
+    B = 1
+    p0 = 1j * expj(t)
+    p1 = expj(-u)
+    p2 = 1-expj(v)
+    p3 = p0 + 1
+    p4 = cu(p2, p1)
+    p5 = cu(p4, p3)
+    p6 = cu(p0, p4)
+    p7 = cu(A, p5)
+    p8 = cu(p6, B)
+    p9 = cu(p7, p1)
+    p10 = cu(p2, p8)
+    q0 = p0 + expj(w)
+    q1 = cu(p4, q0)
+    q2 = cu(q0, p4)
+    q3 = cu(B, q2)
+    q4 = cu(q3, q1)
+    r0 = p3 - expj(-x)
+    r1 = cu(r0, p4)
+    r2 = cu(p4, r0)
+    r3 = cu(r2, A)
+    r4 = cu(r1, r3)
+    vertices = (A, B, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, q0, q1, q2, q3, q4, r0, r1, r2, r3, r4)
+    return vertices, abs(p0 - p10) - 1, abs(p3 - p9) - 1, abs(p0 - q4) - 1, abs(p3 - r4) - 1
+
+def hodfish(t0=0):
+    """Hochberg–O'Donnell fish graph, not rigid (|t0| <= ~0.5)"""
+    u_estimate = 0.424082 - 0.311038*t0
+    v_estimate = 0.424082 + 0.311038*t0
+    f = lambda u, v: hodfish_vertices(t0, u, v, 0, 0)[1:3]
+    u0, v0 = findroot(f, (u_estimate, v_estimate))
+    w_estimate = polyval([-0.465329, 0.516923, 0.320761, 1.27248], t0)
+    f = lambda w: hodfish_vertices(t0, u0, v0, w, 0)[3]
+    w0 = findroot(f, w_estimate)
+    x_estimate = polyval([0.465329, 0.516923, -0.320761, 1.27248], t0)
+    f = lambda x: hodfish_vertices(t0, u0, v0, w0, x)[4]
+    x0 = findroot(f, x_estimate)
+    vertices = hodfish_vertices(t0, u0, v0, w0, x0)[0]
+    return all_unit_distances(vertices)
