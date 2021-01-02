@@ -82,10 +82,10 @@ def ei17():
     vertices = ei17_vertices(*x0)[0]
     return all_unit_distances(vertices)
 
-def ei19_vertices(t, u, v):
+def ei19_vertices(v):
     A = 0
     B = 1
-    p0 = mpc(t, u)
+    p0 = mpc(0.5, (sqrt(32) + sqrt(35)) / 6)
     p1 = cu(A, p0)
     p2 = cu(p0, A)
     p3 = cu(B, p0)
@@ -104,17 +104,14 @@ def ei19_vertices(t, u, v):
     p15 = cu(p13, p11)
     p16 = cu(p14, p15)
     vertices = (A, B, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16)
-    return vertices, abs(p8 - p10) - 1, abs(p9 - p10) - 1, abs(p9 - p16) - 1
+    return vertices, abs(p9 - p16) - 1
 
 def ei19():
     """Exoo-Ismailescu graph 19, (2, 1) parameters, rigid"""
-    f = lambda *x: ei19_vertices(*(x + (-0.1,)))[1:3]
-    t, u = findroot(f, (0.5, 1.9))
-    print(det(jacobian(f, (t, u)))) # non-zero
-    f = lambda v: ei19_vertices(t, u, v)[-1]
-    v = findroot(f, -0.1)
-    print(diff(f, v)) # non-zero
-    vertices = ei19_vertices(t, u, v)[0]
+    f = lambda v: ei19_vertices(v)[1]
+    v0 = findroot(f, -0.1)
+    print(diff(f, v0)) # non-zero
+    vertices = ei19_vertices(v0)[0]
     return all_unit_distances(vertices)
 
 def ei21_vertices(t, u, v, w):

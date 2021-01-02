@@ -125,3 +125,25 @@ def mcgee():
     edges = ring_edges(4, ((0, 0, 2), (1, 1, 2), (1, 2, 3), (1, 4, 2), (0, 3, 0), (0, 5, 0),
                            (2, 3, 0), (2, 3, 1), (4, 5, 0), (4, 5, 3)))
     return (vertices, edges)
+
+def khodulyov_pentagon():
+    """Return Andrei Khodulyov's regular pentagon made rigid with 31 edges."""
+    A = 0
+    B = 1
+    p0 = expj(-2*pi/5)
+    p1 = 1+expj(-3*pi/5)
+    p2 = cu(p1, p0)
+    p3 = cu(p2, A)
+    p4 = cu(B, p2)
+    p5 = cu(p3, p1)
+    p6 = cu(p0, p4)
+    p7 = cu(p1, A)
+    p8 = cu(p7, p5)
+    p9 = cu(p6, B)
+    p10 = cu(p4, p8)
+    p11 = cu(p8, p4)
+    p12 = cu(p9, p8)
+    p13 = cu(p8, p9)
+    p14 = cu(p8, B)
+    vertices = (A, B, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14)
+    return all_unit_distances(vertices)
