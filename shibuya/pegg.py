@@ -196,7 +196,7 @@ def hodfish(t0=0):
     vertices = hodfish_vertices(t0, u0, v0, w0, x0)[0]
     return all_unit_distances(vertices)
 
-def min_hodfish_vertices(t, u):
+def cloud9_vertices(t, u):
     p0 = 0
     p1 = 1
     p2 = mpc(t, sqrt(1-t**2))
@@ -210,12 +210,14 @@ def min_hodfish_vertices(t, u):
     p10 = cu(p9, p7)
     p11 = cu(p7, p8)
     vertices = (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
+    vertices = [(v * 1j).conjugate() for v in vertices]
     return vertices, abs(p0 - p10) - 1, abs(p1 - p11) - 1
 
-def min_hodfish():
-    """Minimal triangle-free braced square, 12 vertices, 21 edges, based on the hodfish"""
-    f = lambda *x: min_hodfish_vertices(*x)[1:]
+def cloud9():
+    """Minimal triangle-free braced square, 12 vertices, 21 edges, based on the hodfish
+    Looks like Cloud9's logo if you squint"""
+    f = lambda *x: cloud9_vertices(*x)[1:]
     x0 = findroot(f, (0, 0.66))
     print(det(jacobian(f, x0))) # non-zero
-    vertices = min_hodfish_vertices(*x0)[0]
+    vertices = cloud9_vertices(*x0)[0]
     return all_unit_distances(vertices)
