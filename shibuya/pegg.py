@@ -196,29 +196,26 @@ def hodfish(t0=0):
     vertices = hodfish_vertices(t0, u0, v0, w0, x0)[0]
     return all_unit_distances(vertices)
 
-def rigid_hodfish_vertices(t, u, v):
-    A = 0
-    B = 1
-    p0 = 1j * expj(t)
-    p1 = expj(-u)
-    p2 = 1-expj(v)
-    p3 = p0 + 1
-    p4 = cu(p2, p1)
-    p5 = cu(p4, p3)
-    p6 = cu(p0, p4)
-    p7 = cu(A, p5)
-    p8 = cu(p6, B)
-    p9 = cu(p7, p1)
-    p10 = cu(p2, p8)
-    p11 = cu(p7, B)
-    p12 = cu(p11, p0)
-    vertices = (A, B, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)
-    return vertices, abs(p0 - p10) - 1, abs(p3 - p9) - 1, abs(p4 - p12) - 1
+def min_hodfish_vertices(t, u):
+    p0 = 0
+    p1 = 1
+    p2 = mpc(t, sqrt(1-t**2))
+    p3 = mpc(-u, sqrt(1-u**2))
+    p4 = p2 + 1
+    p5 = p3 + 1
+    p6 = cu(p3, p4)
+    p7 = cu(p4, p3)
+    p8 = cu(p5, p2)
+    p9 = cu(p6, p8)
+    p10 = cu(p9, p7)
+    p11 = cu(p7, p8)
+    vertices = (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
+    return vertices, abs(p0 - p10) - 1, abs(p1 - p11) - 1
 
-def rigid_hodfish():
-    """Rigidified (and minimised) Hochberg–O'Donnell fish graph"""
-    f = lambda *x: rigid_hodfish_vertices(*x)[1:]
-    x0 = findroot(f, (0.05, 0.4, 0.45))
+def min_hodfish():
+    """Minimal triangle-free braced square, 12 vertices, 21 edges, based on the hodfish"""
+    f = lambda *x: min_hodfish_vertices(*x)[1:]
+    x0 = findroot(f, (0, 0.66))
     print(det(jacobian(f, x0))) # non-zero
-    vertices = rigid_hodfish_vertices(*x0)[0]
+    vertices = min_hodfish_vertices(*x0)[0]
     return all_unit_distances(vertices)
