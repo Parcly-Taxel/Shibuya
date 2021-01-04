@@ -200,24 +200,24 @@ def cloud9_vertices(t, u):
     p0 = 0
     p1 = 1
     p2 = mpc(t, sqrt(1-t**2))
-    p3 = mpc(-u, sqrt(1-u**2))
+    p3 = mpc(sqrt(1-u**2), u)
     p4 = p2 + 1
     p5 = p3 + 1
     p6 = cu(p3, p4)
     p7 = cu(p4, p3)
-    p8 = cu(p5, p2)
-    p9 = cu(p6, p8)
-    p10 = cu(p9, p7)
-    p11 = cu(p7, p8)
+    p8 = cu(p2, p5)
+    p9 = cu(p8, p6)
+    p10 = cu(p7, p8)
+    p11 = cu(p10, p6)
     vertices = (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
-    vertices = [(v * 1j).conjugate() for v in vertices]
-    return vertices, abs(p0 - p10) - 1, abs(p1 - p11) - 1
+    return vertices, abs(p0 - p11) - 1, abs(p1 - p9) - 1
 
 def cloud9():
-    """Minimal triangle-free braced square, 12 vertices, 21 edges, based on the hodfish
+    """Minimal triangle-free braced square, 12 vertices, 21 edges, based on the hodfish.
     Looks like Cloud9's logo if you squint"""
     f = lambda *x: cloud9_vertices(*x)[1:]
-    x0 = findroot(f, (0, 0.66))
+    x0 = (0, 0.75)
+    print(f(*x0)) # zero within floating-point error
     print(det(jacobian(f, x0))) # non-zero
     vertices = cloud9_vertices(*x0)[0]
     return all_unit_distances(vertices)
