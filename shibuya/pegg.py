@@ -222,31 +222,33 @@ def cloud9():
     vertices = cloud9_vertices(*x0)[0]
     return all_unit_distances(vertices)
 
-def tfrhexagon_vertices(t, u, v):
+def tfrhexagon_vertices(v, mode=0):
     p0 = 0
     p1 = -1
-    p2 = expj(t)
-    p3 = expj(u)
-    p4 = p1 + p2
-    p5 = p3 + p1
+    p2 = root(1, 6, 1)
+    p3 = root(1, 6, 5)
+    p4 = p1 + p2 # v1
+    p5 = p3 + p1 # v2
     p6 = p2 + p3
-    p7 = expj(v)
-    p8 = cu(p4, p7)
-    p9 = cu(p7, p5)
-    p10 = cu(p5, p8)
-    p11 = cu(p10, p0)
-    p12 = cu(p11, p7)
-    p13 = cu(p8, p12)
-    p14 = cu(p11, p13)
-    p15 = cu(p10, p9)
+    p7 = expj(v) # v3
+    p8 = p4 + p7
+    p9 = p5 + p7
+    p10 = cu(p8, p5) if mode == 1 else cu(p5, p8)
+    p11 = p10 - p5 # v4
+    p12 = p7 + p11
+    p13 = p4 + p7 + p11
+    p14 = p4 + p11
+    p15 = p5 + p7 + p11
     vertices = (p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15)
-    return vertices, abs(p4 - p14) - 1, abs(p15 - p12) - 1, abs(p15 - p6) - 1
+    return vertices, abs(p15 - p6) - 1
 
-def tfrhexagon():
-    f = lambda *x: tfrhexagon_vertices(*x)[1:]
-    x0 = findroot(f, (1, -1.2, -0.7))
-    print(det(jacobian(f, x0))) # non-zero
-    vertices = tfrhexagon_vertices(*x0)[0]
+def tfrhexagon(mode=0):
+    """Triangle-free braced hexagon. mode (0 or 1) selects between two algebraically
+    related versions (corresponding coordinates have the same minimal polynomial)."""
+    f = lambda v: tfrhexagon_vertices(v, mode)[1]
+    v0 = findroot(f, -0.6)
+    print(diff(f, v0)) # non-zero
+    vertices = tfrhexagon_vertices(v0, mode)[0]
     edges = list(all_unit_distances(vertices)[1])
     edges.remove((0, 4))
     edges.remove((0, 5))
