@@ -85,65 +85,15 @@ def harborth():
     vertices = half + [p.conjugate() for p in half if p.imag > 0]
     return all_unit_distances(vertices)
 
-def rigid_heptagon(suppress=None):
-    """Return a unit-distance graph containing a regular heptagon that was conjectured by
-    Ed Pegg to be rigid in https://math.stackexchange.com/q/3954719/357390.
-    I proved it to be rigid, even when two adjacent vertices are deleted;
-    use (2,3) or (2,2) or (3,3) as the parameter to see these reduced rigid graphs."""
-    u7 = unitroots(7)
-    s1 = star_radius(7)
-    r1 = [s1*u for u in u7]
-    z2 = cu(0, s1, star_radius(7, 2), 1)
-    r2 = [z2*u for u in u7]
-    z3 = cu(s1, 0, 1, star_radius(7, 3))
-    r3 = [z3*u for u in u7]
-    vertices = r1 + r2 + r3
-    edges = ring_edges(7, ((0, 0, 1), (1, 1, 2), (0, 1, 0), (2, 2, 3), (0, 2, 0), (1, 2, 0)))
-    G = (vertices, edges)
-    if suppress == (2,3):
-        return delete_vertices(G, (7, 14))
-    if suppress == (2,2):
-        return delete_vertices(G, (8, 13))
-    if suppress == (3,3):
-        return delete_vertices(G, (14, 17))
-    return G
-
-def mcgee():
-    """Return a unit-distance embedding of the McGee graph.
-    From https://math.stackexchange.com/q/1484002/357390"""
-    u8 = unitroots(8)
-    r0 = [u/2 for u in u8[::2]]
-    r1 = [u/2 for u in u8[1::2]]
-    pol = [32, -192, 624, -1344, 2496, -4896, 9664, -15360, 17838, -14220, 7425, -2268, 324]
-    z0 = polyroots(pol)[-2] / (1-1j)
-    z1 = cu(z0, r0[0])
-    r2 = [z0*u for u in u8[::2]]
-    r3 = [z1*u for u in u8[::2]]
-    r4 = [z0.conjugate()*u for u in u8[::2]]
-    r5 = [z1.conjugate()*u for u in u8[::2]]
-    vertices = r0 + r1 + r2 + r3 + r4 + r5
-    edges = ring_edges(4, ((0, 0, 2), (1, 1, 2), (1, 2, 3), (1, 4, 2), (0, 3, 0), (0, 5, 0),
-                           (2, 3, 0), (2, 3, 1), (4, 5, 0), (4, 5, 3)))
-    return (vertices, edges)
-
-def khodulyov_pentagon():
-    """Return Andrei Khodulyov's regular pentagon made rigid with 31 edges."""
-    A = 0
-    B = 1
-    p0 = expj(-2*pi/5)
-    p1 = 1+expj(-3*pi/5)
-    p2 = cu(p1, p0)
-    p3 = cu(p2, A)
-    p4 = cu(B, p2)
-    p5 = cu(p3, p1)
-    p6 = cu(p0, p4)
-    p7 = cu(p1, A)
-    p8 = cu(p7, p5)
-    p9 = cu(p6, B)
-    p10 = cu(p4, p8)
-    p11 = cu(p8, p4)
-    p12 = cu(p9, p8)
-    p13 = cu(p8, p9)
-    p14 = cu(p8, B)
-    vertices = (A, B, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14)
+def mcgee(mode=0):
+    """Return a unit-distance embedding of the McGee graph,
+    from https://math.stackexchange.com/q/1484002/357390. mode (0 or 1)
+    selects between two algebraically related forms."""
+    a = polyroots([1, 0, -129, -218])[mode]
+    t = polyroots([1, (a**2+3*a-52)/68, (a+3)/16])[1]
+    core = [u/2 for u in unitroots(8)]
+    z0 = mpc(0.5+t, -root(1-t**2, 2, mode))
+    z1 = cu(z0, core[1])
+    outer = [z*u for z in (z0, conj(z0), z1, conj(z1)) for u in unitroots(4)]
+    vertices = core + outer
     return all_unit_distances(vertices)
