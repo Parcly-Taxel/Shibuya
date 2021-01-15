@@ -34,22 +34,49 @@ def flowersnark(n=5):
     edges = ring_edges(n, ((1, 0, 1), (1, 0, -1), (0, 2, 0), (1, 2, 0), (2, 3, 0), (3, 3, 1)))
     return (vertices, edges)
 
-def blanusa2():
-    """Draws a unit-distance embedding of the second Blanuša snark."""
-    u4 = unitroots(4)
-    v1 = [u/2 for u in u4]
-    v2_s = cu(v1[1], v1[0])
-    v2 = [v2_s*u for u in u4]
-    vertices1 = v1 + v2
-    edges1 = [(0, 2), (1, 3), (0, 4), (4, 1), (1, 5), (5, 2), (2, 6), (6, 3), (3, 7), (7, 0)]
-    tvec = mpc(sqrt(111), 15) / sqrt(336)
-    vertices2 = [v + tvec for v in vertices1]
-    edges2 = [(a + 8, b + 8) for (a, b) in edges1]
-    vertices = vertices1 + vertices2
-    va = cu(vertices[4], vertices[12])
-    vb = cu(vertices[13], vertices[5])
-    vertices.extend([va, vb])
-    edges = edges1 + edges2 + [(6, 14), (7, 15), (4, 16), (12, 16), (5, 17), (13, 17), (16, 17)]
+def blanusa1():
+    """Draws a unit-distance embedding of the first Blanuša snark."""
+    p0 = rect(0.5, atan(1/sqrt(2)))
+    p1 = -conj(p0)
+    p2 = -p0
+    p3 = conj(p0)
+    p4 = cu(p1, p0)
+    p5 = cu(p2, p1)
+    p6 = cu(p3, p2)
+    p7 = cu(p0, p3)
+    s1 = [p0, p1, p2, p3, p4, p5, p6, p7]
+    s2 = [p-1j for p in s1]
+    A = cu(s1[2], s1[0])
+    B = cu(s1[1], s1[3])
+    vertices = s1 + s2 + [A, B]
+    edges = set(all_unit_distances(vertices)[1])
+    edges -= {(0, 8), (1, 9), (2, 10), (3, 11), (0, 2), (1, 3)}
+    return (vertices, edges)
+
+def blanusa2_vertices(t, u):
+    p0 = rect(0.5, t)
+    p1 = -conj(p0)
+    p2 = -p0
+    p3 = conj(p0)
+    p4 = cu(p1, p0)
+    p5 = cu(p2, p1)
+    p6 = cu(p3, p2)
+    p7 = cu(p0, p3)
+    s1 = [p0, p1, p2, p3, p4, p5, p6, p7]
+    s2 = [p+expj(u) for p in s1]
+    A = cu(s2[4], s1[4])
+    B = cu(s1[7], s2[7])
+    vertices = s1 + s2 + [A, B]
+    return vertices, abs(A - B) - 1
+
+def blanusa2(t=pi/3):
+    """Draws a unit-distance embedding of the second Blanuša snark.
+    t (0 <= t <= pi/2) controls the proportions of the two stars inside."""
+    f = lambda u: blanusa2_vertices(t, u)[1]
+    u0 = findroot(f, 0.1)
+    vertices = blanusa2_vertices(t, u0)[0]
+    edges = set(all_unit_distances(vertices)[1])
+    edges -= {(0, 8), (1, 9), (2, 10), (3, 11), (4, 12), (7, 15)}
     return (vertices, edges)
 
 def franklin():
