@@ -1,8 +1,8 @@
 """
 Cubic symmetric graphs. Most of the embeddings realised here were taken from MathWorld.
 """
-from mpmath import mp, mpc, sqrt, root, findroot, unitroots, polyval, extradps, ldexp
-from shibuya.generators import cu, star_radius, ring_edges
+from mpmath import *
+from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances
 
 def pappus():
     """Return a unit-distance embedding of the Pappus graph (F18A)."""
@@ -111,6 +111,20 @@ def biggssmith():
     return (vertices, edges)
 
 def heawood():
+    """Return the symmetric unit-distance embedding of the Heawood graph
+    tucked away in Mathematica's GraphData."""
+    P = [10485760, 78643200, 263192576, 543686656, 812777472, 942080000, 843317248, 552468480, 208879616, -31170560, -99213312, -76779520, -32795648, 7878144, 17269760, 16256512, 11392032, 4836080, 3014064, 361320, 69498, -165789]
+    # v0 is the only real root of the above polynomial
+    v0 = polyroots(P, maxsteps=1000)[0]
+    p0 = mpc(0.5, v0)
+    p1 = mpc(sqrt(1-(v0+0.5)**2)-0.5, -0.5)
+    p2 = cu(p0, -p0)
+    p3 = cu(p1, -p1)
+    p4 = cu(p2, p3)
+    vertices = [mpc(s*re(v), im(v)) for s in (1, -1) for v in (p0, -p0, p1, -p1, p2, p3, p4)]
+    return all_unit_distances(vertices)
+
+def heawood_gerbracht():
     """Return a unit-distance embedding of the Heawood graph.
     This is the first construction given in Gerbracht (2008),
     Eleven Unit Distance Embeddings of the Heawood Graph,
