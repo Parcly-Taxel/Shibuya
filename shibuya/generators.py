@@ -46,6 +46,8 @@ def cu(z1, z2, r1=1, r2=1):
     """Constructs the point at a distance of r1 from z1 and r2 from z2, left of the
     line from z1 to z2. If r1 or r2 is omitted the default is 1."""
     d, theta0 = polar(z2 - z1)
+    if not (abs(r1-r2) < d < r1+r2):
+        raise ValueError("point cannot be constructed")
     theta = acos((r1*r1 - r2*r2 + d*d) / (2*d*r1))
     return z1 + r1 * expj(theta0 + theta)
 

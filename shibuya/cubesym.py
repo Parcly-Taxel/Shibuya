@@ -150,3 +150,24 @@ def heawood_gerbracht():
     vertices = (l1, l2, l3, l4, l5, l6, l7, p1, p2, p3, p4, p5, p6, p7)
     edges = ring_edges(7, ((0, 1, 0), (0, 1, -1), (0, 1, 2)))
     return (vertices, edges)
+
+def f26a_vertices(t):
+    A, B, C = unitroots(6)[4:1:-1]
+    p1 = rect(0.5, t)
+    p2 = p1 * root(1, 6, 5)
+    p3 = p1 * root(1, 6, 4)
+    p4 = cu(p1, B)
+    p5 = cu(p2, C)
+    p6 = cu(p3, -A)
+    p7 = cu(p1, -p6)
+    p8 = cu(p4, p2) # 1
+    p9 = cu(p5, p3) # 1
+    p10 = cu(-p8, p7) # 1
+    V = (A, B, C, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
+    return ([v*s for v in V for s in (1, -1)], abs(p9 - p10) - 1)
+
+def f26a():
+    """Return a unit-distance embedding of the F26A graph."""
+    x0 = findroot(lambda x: f26a_vertices(x)[1], 2.4)
+    vertices = f26a_vertices(x0)[0]
+    return all_unit_distances(vertices)
