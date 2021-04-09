@@ -59,7 +59,8 @@ named_gp = {"cube": (4, 1),
             "mobiuskantor": (8, 3),
             "dodecahedron": (10, 2),
             "desargues": (10, 3),
-            "nauru": (12, 5)}
+            "nauru": (12, 5),
+            "f48a": (24, 5)}
 
 def genpetersen(n=5, k=2):
     """Return a unit-distance embedding of the generalised Petersen graph GP(n, k),

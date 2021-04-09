@@ -51,6 +51,12 @@ def cu(z1, z2, r1=1, r2=1):
     theta = acos((r1*r1 - r2*r2 + d*d) / (2*d*r1))
     return z1 + r1 * expj(theta0 + theta)
 
+def circumcentre(a, b, c):
+    """Constructs the circumcentre of points a, b and c."""
+    A, B, C = abs(b-c)**2, abs(c-a)**2, abs(a-b)**2
+    w = (A*(B+C-A), B*(C+A-B), C*(A+B-C))
+    return fdot([a, b, c], w) / sum(w)
+
 def star_radius(p, q=1):
     """Calculates the radius of the regular star polygon {p/q} with
     unit-length edges. If q=1 the star becomes a polygon."""

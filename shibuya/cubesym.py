@@ -2,7 +2,7 @@
 Cubic symmetric graphs. Most of the embeddings realised here were taken from MathWorld.
 """
 from mpmath import *
-from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances
+from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances, circumcentre
 
 # F4A = tetrahedron() or complete(4) (not unit-distance)
 # F6A = circulant(6, (1, 3)) or mobiusladder(3) (not unit-distance)
@@ -94,8 +94,7 @@ def tutte8_vertices(x):
     return (r0 + r1 + r2 + r3 + r4 + r5, abs(z4-z5)-1)
 
 def tutte8():
-    """Return a unit-distance embedding of the Tutte 8-cage (F30A; MathWorld calls this
-    the Levi graph)."""
+    """Return a unit-distance embedding of the Tutte 8-cage (F30A)."""
     x0 = findroot(lambda x: tutte8_vertices(x)[1], [0.33, 0.34])
     vertices = tutte8_vertices(x0)[0]
     edges = ring_edges(5, ((0, 2, 1), (0, 2, 3), (0, 3, 2), (1, 3, 4), (1, 4, 1), (1, 4, 2),
@@ -114,8 +113,46 @@ def dyck():
     edges = ring_edges(8, ((0, 1, 1), (0, 1, -1), (0, 2, -1), (2, 2, 1), (1, 3, 0), (3, 3, 3)))
     return (vertices, edges)
 
+def f38a_vertices(a):
+    u3 = unitroots(6)[:3]
+    signs = (-1, -1, 1)
+    points = []
+    points.append([u for u in u3])
+    points.append([2*u for u in u3])
+    z2 = rect(0.5, a)
+    points.append([z2*u for u in u3])
+    points.append([cu(points[2][i], points[1][i]) for i in range(3)])
+    points.append([cu(points[3][i], u3[1]*points[1][i]) for i in range(3)])
+    points.append([cu(*(-u3[1]*points[2][i], points[4][i])[::signs[i]]) for i in range(3)])
+    last = circumcentre(points[5][0], -points[5][1], points[5][2])
+    points[5].append(last)
+    vertices = [s*p for s in (1, -1) for ray in points for p in ray]
+    return (vertices, abs(last - points[5][0])-1)
+
+def f38a():
+    """Return a unit-distance embedding of the F38A graph."""
+    a0 = findroot(lambda a: f38a_vertices(a)[1], 0.29)
+    return all_unit_distances(f38a_vertices(a0)[0])
+
+def f40a(x=0.75):
+    """Return a unit-distance embedding of F40A (bipartite double cover of F20A).
+    x can be anything between (sqrt(5)-1)/2 and 1."""
+    u10 = unitroots(10)
+    z0 = star_radius(10)
+    r0 = [z0*u for u in u10]
+    z1 = cu(r0[1], 0, 1, x)
+    r1 = [z1*u for u in u10]
+    z2 = cu(r1[2], r1[-2])
+    r2 = [z2*u for u in u10]
+    z3 = cu(0, z2, z0, 1)
+    r3 = [z3*u for u in u10]
+    vertices = r0 + r1 + r2 + r3
+    return all_unit_distances(vertices)
+
+# F48A = genpetersen("f48a")
+
 def klein(a1=4.47, a2=2.42, a3=0.7, s1=1, s2=-1):
-    """Return a unit-distance embedding of the cubic Klein graph (F056B)."""
+    """Return a unit-distance embedding of the cubic Klein graph (F56B)."""
     u7 = unitroots(7)
     z0 = star_radius(7)
     r0 = [z0*u for u in u7]
