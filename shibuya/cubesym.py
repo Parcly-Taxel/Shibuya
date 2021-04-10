@@ -113,26 +113,25 @@ def dyck():
     edges = ring_edges(8, ((0, 1, 1), (0, 1, -1), (0, 2, -1), (2, 2, 1), (1, 3, 0), (3, 3, 3)))
     return (vertices, edges)
 
-def f38a_vertices(a):
-    u3 = unitroots(6)[:3]
-    signs = (-1, -1, 1)
-    points = []
-    points.append([u for u in u3])
-    points.append([2*u for u in u3])
-    z2 = rect(0.5, a)
-    points.append([z2*u for u in u3])
-    points.append([cu(points[2][i], points[1][i]) for i in range(3)])
-    points.append([cu(points[3][i], u3[1]*points[1][i]) for i in range(3)])
-    points.append([cu(*(-u3[1]*points[2][i], points[4][i])[::signs[i]]) for i in range(3)])
-    last = circumcentre(points[5][0], -points[5][1], points[5][2])
-    points[5].append(last)
-    vertices = [s*p for s in (1, -1) for ray in points for p in ray]
-    return (vertices, abs(last - points[5][0])-1)
+def f38a_vertices(t):
+    u6 = unitroots(6)
+    vertices = []
+    p0 = 1
+    p1 = 2
+    p2 = rect(0.5, t)
+    p3 = cu(p2, p1)
+    p4 = cu(p3, 2*u6[1])
+    for (i, u) in enumerate(u6):
+        p5 = cu(u6[4]*p2, p4) if i in (2, 5) else cu(p4, u6[4]*p2)
+        vertices.extend(p*u for p in (p0, p1, p2, p3, p4, p5))
+    p6 = circumcentre(vertices[5], vertices[17], vertices[29])
+    vertices.extend((p6, -p6))
+    return (vertices, abs(p6 - vertices[5]) - 1)
 
 def f38a():
     """Return a unit-distance embedding of the F38A graph."""
-    a0 = findroot(lambda a: f38a_vertices(a)[1], 0.29)
-    return all_unit_distances(f38a_vertices(a0)[0])
+    t0 = findroot(lambda t: f38a_vertices(t)[1], 0.29)
+    return all_unit_distances(f38a_vertices(t0)[0])
 
 def f40a(x=0.75):
     """Return a unit-distance embedding of F40A (bipartite double cover of F20A).
@@ -149,7 +148,40 @@ def f40a(x=0.75):
     vertices = r0 + r1 + r2 + r3
     return all_unit_distances(vertices)
 
-# F48A = genpetersen("f48a")
+def f42a_vertices(a, b, c):
+    u7 = unitroots(7)
+    pa = mpc(a, 0.5)
+    pb = mpc(b, 0.5)
+    pc = mpc(c, 0.5)
+    pac, pbc, pcc = (conj(p) for p in (pa, pb, pc))
+    d1 = abs(pa - u7[1]*pbc)**2 - 1
+    d2 = abs(pb - u7[2]*pcc)**2 - 1
+    d3 = abs(pc - u7[4]*pac)**2 - 1
+    vertices = [u*p for u in u7 for p in (pa, pb, pc, pac, pbc, pcc)]
+    return (vertices, (d1, d2, d3))
+
+def f42a(mode=0):
+    """Return a unit-distance embedding of the F42A graph.
+    mode (0 or 1) selects between two algebraically related forms."""
+    x0 = (0.27, 1.36, 0.52) if mode == 0 else (1.24, 0.18, -0.53)
+    t0 = findroot(lambda *t: f42a_vertices(*t)[1], x0)
+    return all_unit_distances(f42a_vertices(*t0)[0])
+
+# F48A = genpetersen("f48a") but the resulting embedding is vertex-edge-degenerate, so...
+def f48a():
+    """Return a non-degenerate unit-distance embedding of the F48A graph."""
+    R = (2 + 3*sqrt(2) + sqrt(12*sqrt(6)-26)) / 4
+    r = (2 + 3*sqrt(2) - sqrt(12*sqrt(6)-26)) / 4
+    L = R-1
+    l = r-1
+    u24 = unitroots(24)
+    ring_R = [u*R for u in u24[::2]]
+    ring_r = [u*r for u in u24[1::2]]
+    ring_L = [u*L for u in u24[::2]]
+    ring_l = [u*l for u in u24[1::2]]
+    vertices = ring_R + ring_r + ring_L + ring_l
+    edges = ring_edges(12, ((0, 1, 0), (0, 1, -1), (0, 2, 0), (1, 3, 0), (2, 3, 2), (2, 3, -3)))
+    return (vertices, edges)
 
 def klein(a1=4.47, a2=2.42, a3=0.7, s1=1, s2=-1):
     """Return a unit-distance embedding of the cubic Klein graph (F56B)."""
