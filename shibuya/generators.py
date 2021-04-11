@@ -73,6 +73,16 @@ def ring_edges(n, triples):
         L.extend([(i+a*n, (i+k)%n + b*n) for i in range(limit)])
     return L
 
+def lcf_edges(n, pattern):
+    """Return edges corresponding to the LCF notation [pattern]^(n/len(pattern))."""
+    res = ring_edges(n, [(0, 0, 1)])
+    p = len(pattern)
+    for i in range(n):
+        j = (i + pattern[i%p]) % n
+        if j > i:
+            res.append((i, j))
+    return res
+
 def all_unit_distances(vertices, tol=1e-12):
     """Returns the graph formed by inserting all edges of length 1 between the vertices."""
     n = len(vertices)

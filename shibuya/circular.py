@@ -3,7 +3,7 @@ Functions to draw graphs with a distinctly circular layout.
 They are not always unit-distance or integral, obviously.
 """
 from mpmath import root, unitroots
-from shibuya.generators import star_radius, ring_edges, cartesian_product
+from shibuya.generators import star_radius, ring_edges, lcf_edges, cartesian_product
 
 def circulant(n, taps):
     """Return the circulant graph on n vertices with offsets given by taps.
@@ -20,6 +20,13 @@ def cycle(n):
 def complete(n):
     """Return the complete graph on n vertices."""
     return circulant(n, range(1, n//2+1))
+
+def lcf_graph(n, pattern):
+    """Return the graph with the given LCF notation; the number of repeats is implied.
+    Vertices are arranged in a circle."""
+    r = star_radius(n)
+    vertices = [r*u for u in unitroots(n)]
+    return (vertices, lcf_edges(n, pattern))
 
 def mobiusladder(n=3):
     """Return the Möbius ladder on 2n vertices. The n = 3 case corresponds

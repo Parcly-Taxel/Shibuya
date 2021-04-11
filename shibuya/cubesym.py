@@ -2,7 +2,8 @@
 Cubic symmetric graphs. Most of the embeddings realised here were taken from MathWorld.
 """
 from mpmath import *
-from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances, circumcentre
+from shibuya.generators import cu, star_radius, ring_edges, lcf_edges
+from shibuya.generators import all_unit_distances, circumcentre
 
 # F4A = tetrahedron() or complete(4) (not unit-distance)
 # F6A = circulant(6, (1, 3)) or mobiusladder(3) (not unit-distance)
@@ -208,7 +209,26 @@ def klein(a1=4.47, a2=2.42, a3=0.7, s1=1, s2=-1):
                            (4, 6, 0), (5, 7, 0), (6, 6, 2), (7, 7, 3)))
     return (vertices, edges)
 
-def foster_vertices(r):
+def foster_vertices(n, t):
+    s2, s3 = (n&2)-1, ((n&1)<<1)-1
+    c = star_radius(10)
+    cp = c*root(1, 30, 1)
+    a = rect(sec(pi/10), t)
+    ap = rect(tan(pi/10), t+2*pi/5)
+    b = cu(*(a, c)[::s2])
+    bp = cu(*(ap, cp)[::s3])
+    arc = (cp, bp, ap, a, b, c)
+    vertices = [u*p for u in unitroots(15) for p in arc]
+    return (vertices, abs(vertices[1] - vertices[82]) - 1)
+
+def foster(i=5):
+    """Return any one of six (depending on 0 <= i <= 5) unit-distance
+    embeddings of the Foster graph (F90A)."""
+    n, t0 = [(0, 0.38), (1, 1.35), (2, 0.15), (2, 1.18), (2, 4.68), (3, [1.5, 1.6])][i]
+    tstar = findroot(lambda t: foster_vertices(n, t)[1], t0)
+    return (foster_vertices(n, tstar)[0], lcf_edges(90, (17, -9, 37, -37, 9, -17)))
+
+def foster_old_vertices(r):
     v3a = 0.265
     v3 = v3a * root(1, 5, 2)
     v2 = cu(v3, v3a)
@@ -222,10 +242,11 @@ def foster_vertices(r):
     vertices = [v*u for v in vgens for u in unitroots(15)]
     return (vertices, abs(v1 - v4*root(1, 15, 2)) - 1)
 
-def foster():
-    """Return a unit-distance embedding of the Foster graph (F90A)."""
-    r0 = findroot(lambda r: foster_vertices(r)[1], 0.35)
-    vertices = foster_vertices(r0)[0]
+def foster_old():
+    """Return the unit-distance embedding of the Foster graph (F90A)
+    originally in Dounreay."""
+    r0 = findroot(lambda r: foster_old_vertices(r)[1], 0.35)
+    vertices = foster_old_vertices(r0)[0]
     edges = ring_edges(15, ((0, 1, 0), (1, 2, 0), (2, 3, 0), (3, 4, 0), (4, 5, 0), (5, 0, -1),
                             (0, 5, -2), (2, 3, -6), (4, 1, -2)))
     return (vertices, edges)
