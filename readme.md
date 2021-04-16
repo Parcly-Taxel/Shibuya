@@ -8,11 +8,12 @@ The name recalls that of another of my repositories dealing heavily with network
 
 How Shibuya renders graphs is very similar to yet another project of mine, [Malibu](https://gitlab.com/parclytaxel/Malibu); it also depends on [mpmath](http://mpmath.org).
 
-The key function is `draw(graph, outfn, scale, vertsize, edgewidth)`:
+The key function is `draw(graph, outfn, ...)`, all of whose arguments are explained below:
 
 * `graph` is a pair of `(vertices, edges)`, where `vertices` is a sequence of complex numbers and `edges` is a sequence of pairs of indices into `vertices`.
 * `outfn` is the output file name (`.svg` is automatically appended).
 * One unit in raw graph coordinates corresponds to `scale` pixels in the SVG file.
 * `vertsize` and `edgewidth` are the radius of each vertex and the width of each edge in raw graph coordinates respectively.
+* `vertstyle` is a function mapping vertex indices to SVG style properties, which are then applied to the corresponding vertices. This can be used, for example, to illustrate a graph colouring.
 
-The last three arguments are optional.
+All but the first two arguments are optional.

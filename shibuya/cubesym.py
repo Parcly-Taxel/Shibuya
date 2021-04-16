@@ -2,6 +2,7 @@
 Cubic symmetric graphs. Most of the embeddings realised here were taken from MathWorld.
 """
 from mpmath import *
+from functools import reduce
 from shibuya.generators import cu, star_radius, ring_edges, lcf_edges
 from shibuya.generators import all_unit_distances, circumcentre
 
@@ -183,6 +184,55 @@ def f48a():
     vertices = ring_R + ring_r + ring_L + ring_l
     edges = ring_edges(12, ((0, 1, 0), (0, 1, -1), (0, 2, 0), (1, 3, 0), (2, 3, 2), (2, 3, -3)))
     return (vertices, edges)
+
+def f50a_vertices(t):
+    u = root(1, 5, 1)
+    table = {(): (0, 3, 4, 5, 6),
+             (1,): (2, 35, 36, 37, 38),
+             (1, 1, 1, 1): (48, 21, 22, 23, 24),
+             (2,): (1, 28, 27, 26, 25),
+             (1, 1): (34, 17, 18, 39, 40),
+             (1, 2): (49, 46, 45, 44, 43),
+             (1, 1, 1): (16, 19, 20, 41, 42),
+             (2, 1): (33, 30, 29, 8, 7),
+             (1, 1, 2): (47, 14, 13, 12, 11),
+             (2, 1, 1): (15, 32, 31, 10, 9)}
+    p0 = rect(star_radius(10), 0.9*pi)
+    p3 = rect(star_radius(10, 3), -0.7*pi)
+    p4 = cu(p3, -conj(p3))
+    p5 = p4 + expj(t)
+    p6 = cu(p5, u*p5)
+    seeds = [p0, p3, p4, p5, p6]
+    vertices = [None] * 50
+    ops = {1: lambda z: u*z, 2: conj}
+    for (aut, coset) in table.items():
+        for (ring, i) in enumerate(coset):
+            vertices[i] = -1j * reduce(lambda z, k: ops[k](z), aut, seeds[ring])
+    return (vertices, re(vertices[40]) + 0.5)
+
+def f50a():
+    """Return a unit-distance embedding of the F50A graph, an embedding
+    found by the computer (specifically the embedding_run() function in embeddingsearch)."""
+    t0 = findroot(lambda t: f50a_vertices(t)[1], 2)
+    return (f50a_vertices(t0)[0], lcf_edges(50, [21, -21, -19, 19, -19, 19, -19, 19, 21, -21]))
+
+def f54a_vertices(t):
+    """Return a unit-distance embedding of the F54A graph."""
+    u18 = unitroots(18)
+    r0 = [u/2 for u in u18]
+    z1 = cu(r0[1], r0[-1])
+    r1 = [z1*u for u in u18]
+    z2a = r1[0] + expj(t)
+    z2b = circumcentre(z2a, u18[2]*z2a, r1[1])
+    r2 = [u*z for u in unitroots(9) for z in (z2a, z2b)]
+    vertices = r0 + r1 + r2
+    return (vertices, abs(z2b - r1[1]) - 1)
+
+def f54a():
+    """Return a unit-distance embedding of the F54A graph."""
+    t0 = findroot(lambda t: f54a_vertices(t)[1], 1.755)
+    edges = ring_edges(18, ((0, 0, 9), (1, 0, 1), (1, 0, -1), (1, 2, 0), (2, 2, 1)))
+    return (f54a_vertices(t0)[0], edges)
 
 def klein(a1=4.47, a2=2.42, a3=0.7, s1=1, s2=-1):
     """Return a unit-distance embedding of the cubic Klein graph (F56B)."""

@@ -1,18 +1,5 @@
 from mpmath import re, im, zeros, diff
 
-def sage_format(graph):
-    """Return the given graph's adjacency matrix as a dictionary mapping vertices
-    to neighbours with higher numbers. This is one of the formats accepted
-    by SageMath's Graph() constructor."""
-    vertices, edges = graph
-    D = {}
-    for (a, b) in edges:
-        a, b = sorted([a, b])
-        if a not in D:
-            D[a] = []
-        D[a].append(b)
-    return D
-
 def rigidity_matrix(graph):
     """Return the rigidity matrix of the given graph.
     If this matrix has rank 2*|V|-3 the graph is infinitesimally rigid."""
