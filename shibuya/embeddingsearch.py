@@ -55,7 +55,9 @@ QUIT_GAP();
         f.write(program)
     proc = run([expanduser(gap_path), "-q", f.name], capture_output=True, text=True)
     res = []
-    for chunk in proc.stdout.strip().split("\n\n"):
+    for chunk in proc.stdout.split("\n\n"):
+        if not chunk:
+            continue
         table = {}
         for coset in chunk.split("\n"):
             aut, points = map(eval, coset.split("/"))
@@ -101,7 +103,7 @@ def beauty_factor(G):
     return min(dists)
 
 def embedding_run(E, sym, k, conclass, gap_path, succount=6,
-        beautylimit=0.01, coordrange=3):
+        beautylimit=0.01, coordrange=3, maxsteps=20):
     """Generate embeddings of the given graph with the given symmetry options;
     return alongside each embedding the corresponding automorphism table and
     solution coordinates."""
@@ -116,7 +118,7 @@ def embedding_run(E, sym, k, conclass, gap_path, succount=6,
         try:
             x = [coordrange*(2*rand()-1) for _ in range(nv)]
             if nv > nc:
-                for _ in range(20):
+                for _ in range(maxsteps):
                     U, S1, V = svd(jacobian(lambda *xx: f(*xx)[1], x))
                     tol = zfloor * max(S1)
                     S2 = diag([1/z if z >= tol else 0 for z in S1])
@@ -126,7 +128,7 @@ def embedding_run(E, sym, k, conclass, gap_path, succount=6,
                     if norm(delta) <= 1e-12:
                         break
             else:
-                x = findroot(lambda *xx: f(*xx)[1], x, maxsteps=20)
+                x = findroot(lambda *xx: f(*xx)[1], x, maxsteps=maxsteps)
             x = list(x)
             # verify that x is indeed a solution
             if norm(matrix(f(*x)[1])) >= 1e-12:

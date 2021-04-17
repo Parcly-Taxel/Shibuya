@@ -234,6 +234,26 @@ def f54a():
     edges = ring_edges(18, ((0, 0, 9), (1, 0, 1), (1, 0, -1), (1, 2, 0), (2, 2, 1)))
     return (f54a_vertices(t0)[0], edges)
 
+def f56a():
+    """Return a unit-distance embedding of the F56A graph.
+    Note that MathWorld's LCF notation for this is incorrect;
+    it should be [11, 13, -13, -11]^14."""
+    t = tan(pi/14)
+    u = sqrt(polyval([-21, 98, 71], t*t))
+    z1 = 2*sqrt(14*polyval([31*u, -20, -154*u, 104, 87*u, -68], t))
+    z2 = 7*t*(t*t-3)**2 - 4*u
+    a = (z1 + z2) / 64
+    b = (z1 - z2) / 64
+
+    u14 = unitroots(14)
+    pa = mpc(a, 0.5)
+    pb = mpc(b, 0.5)
+    pac, pbc = conj(pa), conj(pb)
+    d1 = abs(pa - u14[-1]*pb)**2 - 1
+    d2 = abs(pb - u14[-2]*pa)**2 - 1
+    vertices = [u*p for u in u14 for p in (pa, pb, pac, pbc)]
+    return all_unit_distances(vertices)
+
 def klein(a1=4.47, a2=2.42, a3=0.7, s1=1, s2=-1):
     """Return a unit-distance embedding of the cubic Klein graph (F56B)."""
     u7 = unitroots(7)
@@ -257,6 +277,22 @@ def klein(a1=4.47, a2=2.42, a3=0.7, s1=1, s2=-1):
     edges = ring_edges(7, ((0, 0, 1), (0, 1, 0), (1, 2, 0), (1, 3, 0),
                            (2, 4, -2), (3, 4, 0), (2, 5, 0), (3, 5, -1),
                            (4, 6, 0), (5, 7, 0), (6, 6, 2), (7, 7, 3)))
+    return (vertices, edges)
+
+def f56c():
+    """Return a unit-distance embedding of the F56C graph,
+    the bipartite double cover of the Coxeter graph."""
+    u14 = unitroots(14)
+    z0 = star_radius(14, 5)
+    r0 = [z0*u for u in u14]
+    z1 = star_radius(14, 3)
+    r1 = [z1*u for u in u14]
+    z2 = cu(r1[4], r0[0])
+    r2 = [z2*u for u in u14]
+    z3 = cu(0, z2, star_radius(14), 1)
+    r3 = [z3*u for u in u14]
+    vertices = r0 + r1 + r2 + r3
+    edges = ring_edges(14, ((0, 0, 5), (1, 1, 3), (2, 1, 4), (2, 0, 0), (2, 3, 0), (3, 3, 1)))
     return (vertices, edges)
 
 def foster_vertices(n, t):
