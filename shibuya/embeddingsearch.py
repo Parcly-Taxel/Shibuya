@@ -38,9 +38,9 @@ G := AutomorphismGroup(Gr);
 sH := Size(H);
 for hom in IsomorphicSubgroups(G, H) do
     rings := Orbits(Image(hom));
-    if not ForAll(rings, ring -> Length(ring) = sH) then
-        continue;
-    fi;
+    #if not ForAll(rings, ring -> Length(ring) = sH) then
+    #    continue;
+    #fi;
     seeds := List(rings, ring -> Minimum(ring));
     for aut in H do
         LR := LetterRepAssocWord(Factorization(H, aut));
@@ -66,22 +66,30 @@ QUIT_GAP();
 
         ringmap = {v: i for coset in table.values() for (i, v) in enumerate(coset)}
         constraints = []
+        wyckoffs = []
         for (ri, v) in enumerate(table[tuple()]):
             neigh1 = [e[1] for e in edges if e[0] == v]
             neigh2 = [e[0] for e in edges if e[1] == v]
             for w in filter(lambda x: ringmap[x] >= ri, neigh1 + neigh2):
                 constraints.append((v, w))
+            # Check for invariant ("Wyckoff") positions
+            for g in filter(lambda aut: aut and table[aut][ri] == v, table):
+                wyckoffs.append((ri, g))
 
-        N = len(table) * len(table[tuple()])
-        def graph_vertices(*args, table=table, constraints=constraints):
+        N = max(p for coset in table.values() for p in coset) + 1
+        def graph_vertices(*args, table=table, constraints=constraints, wyckoffs=wyckoffs):
             vertices = [None] * N
             seeds = [mpc(*z) for z in zip(*[iter(args)]*2)]
             for (aut, coset) in table.items():
                 for (ring, i) in enumerate(coset):
                     vertices[i] = reduce(lambda z, k: ops[k](z), aut, seeds[ring])
             cfuncs = [abs(vertices[i] - vertices[j])**2 - 1 for (i, j) in constraints]
+            for (ri, g) in wyckoffs:
+                seed = seeds[ri]
+                tseed = reduce(lambda z, k: ops[k](z), g, seed)
+                cfuncs.append(abs(tseed-seed)**2)
             return (vertices, cfuncs)
-        res.append((table, graph_vertices, 2*len(table[tuple()]), len(constraints)))
+        res.append((table, graph_vertices, 2*len(table[tuple()]), len(constraints) + len(wyckoffs)))
     return res
 
 def beauty_factor(G):
@@ -102,7 +110,7 @@ def beauty_factor(G):
                 dists.extend((abs(a), abs(u-w)))
     return min(dists)
 
-def embedding_run(E, sym, k, conclass, gap_path, succount=6,
+def embedding_run(E, sym, k, conclass, gap_path, succount=6, normlimit=1e-12,
         beautylimit=0.01, coordrange=3, maxsteps=20):
     """Generate embeddings of the given graph with the given symmetry options;
     return alongside each embedding the corresponding automorphism table and
@@ -116,22 +124,19 @@ def embedding_run(E, sym, k, conclass, gap_path, succount=6,
     zfloor = eps * max(nv, nc)
     while s < succount:
         try:
+            # For maximum robustness, manually implemented Newton's method
+            # with pseudoinverse calculation
             x = [coordrange*(2*rand()-1) for _ in range(nv)]
-            if nv > nc:
-                for _ in range(maxsteps):
-                    U, S1, V = svd(jacobian(lambda *xx: f(*xx)[1], x))
-                    tol = zfloor * max(S1)
-                    S2 = diag([1/z if z >= tol else 0 for z in S1])
-                    F = -matrix(f(*x)[1])
-                    delta = V.T * S2 * U.T * F
-                    x = [a + b for (a, b) in zip(x, delta)]
-                    if norm(delta) <= 1e-12:
-                        break
-            else:
-                x = findroot(lambda *xx: f(*xx)[1], x, maxsteps=maxsteps)
-            x = list(x)
-            # verify that x is indeed a solution
-            if norm(matrix(f(*x)[1])) >= 1e-12:
+            for _ in range(maxsteps):
+                U, S1, V = svd(jacobian(lambda *xx: f(*xx)[1], x))
+                tol = zfloor * max(S1)
+                S2 = diag([1/z if z >= tol else 0 for z in S1])
+                F = -matrix(f(*x)[1])
+                delta = V.T * S2 * U.T * F
+                x = [a + b for (a, b) in zip(x, delta)]
+                if norm(delta) <= 1e-12:
+                    break
+            if norm(matrix(f(*x)[1])) >= normlimit:
                 print("N")
                 continue
             G = (f(*x)[0], E)

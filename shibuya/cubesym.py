@@ -217,7 +217,6 @@ def f50a():
     return (f50a_vertices(t0)[0], lcf_edges(50, [21, -21, -19, 19, -19, 19, -19, 19, 21, -21]))
 
 def f54a_vertices(t):
-    """Return a unit-distance embedding of the F54A graph."""
     u18 = unitroots(18)
     r0 = [u/2 for u in u18]
     z1 = cu(r0[1], r0[-1])
@@ -295,6 +294,78 @@ def f56c():
     edges = ring_edges(14, ((0, 0, 5), (1, 1, 3), (2, 1, 4), (2, 0, 0), (2, 3, 0), (3, 3, 1)))
     return (vertices, edges)
 
+def f60a(t=-0.35):
+    """Return a unit-distance embedding of the F60A graph."""
+    u15 = unitroots(15)
+    z0 = star_radius(15, 7)
+    r0 = [z0*u for u in u15]
+    z1 = z0 + expj(t)
+    r1 = [z1*u for u in u15]
+    z2 = cu(r1[3], r1[0])
+    r2 = [z2*u for u in u15]
+    z3 = cu(0, z2, star_radius(15, 2), 1)
+    r3 = [z3*u for u in u15]
+    vertices = r0 + r1 + r2 + r3
+    edges = ring_edges(15, ((0, 0, 7), (0, 1, 0), (2, 1, 0), (2, 1, 3), (2, 3, 0), (3, 3, 2)))
+    return (vertices, edges)
+
+# TODO F62A
+
+def f64a_vertices(a, b):
+    u8 = unitroots(8)
+    p1 = mpc(a, 0.5)
+    p2 = mpc(b, 0.5)
+    p3 = cu(u8[3]*p1, conj(p2), 2, 1)
+    p4 = (u8[3]*p1 + p3) / 2
+    d1 = abs(u8[1]*p3 - p4)**2 - 1
+    d2 = abs(p1 - u8[1]*conj(p2))**2 - 1
+    vertices = [u*p for u in u8 for p in (p1, p2, p3, p4)]
+    vertices += [conj(p) for p in vertices]
+    return vertices, (d1, d2)
+
+def f64a():
+    """Return a unit-distance embedding of the F64A graph."""
+    t0 = findroot(lambda *t: f64a_vertices(*t)[1], (0.53, 1.6))
+    return all_unit_distances(f64a_vertices(*t0)[0])
+
+def f72a_vertices(t):
+    u24 = unitroots(24)
+    u12 = unitroots(12)
+    z0 = star_radius(24, 11)
+    r0 = [u*z0 for u in u24]
+    z1 = star_radius(24, 7) * expj(t)
+    r1 = [u*z1 for u in u24]
+    z2 = cu(r0[0], r1[9])
+    r2 = [u*z2 for u in u12]
+    z3 = cu(r0[15], r1[6])
+    r3 = [u*z3 for u in u12]
+    vertices = r0 + r1 + r2 + r3
+    return (vertices, abs(z2 - z3) - 1)
+
+def f72a():
+    """Return a unit-distance embedding of the F72A graph."""
+    t0 = findroot(lambda t: f72a_vertices(t)[1], 2.2)
+    return all_unit_distances(f72a_vertices(t0)[0])
+
+# TODO F74A
+
+def f78a_vertices(a, b, c):
+    u13 = unitroots(13)
+    pa = mpc(a, 0.5)
+    pb = mpc(b, 0.5)
+    pc = mpc(c, 0.5)
+    pac, pbc, pcc = (conj(p) for p in (pa, pb, pc))
+    d1 = abs(pa - u13[5]*pbc)**2 - 1
+    d2 = abs(pb - u13[2]*pcc)**2 - 1
+    d3 = abs(pc - u13[6]*pac)**2 - 1
+    vertices = [u*p for u in u13 for p in (pa, pb, pc, pac, pbc, pcc)]
+    return (vertices, (d1, d2, d3))
+
+def f78a():
+    """Return a unit-distance embedding of the F78A graph."""
+    t0 = findroot(lambda *t: f78a_vertices(*t)[1], (-1.1, 1.6, 2.2))
+    return all_unit_distances(f78a_vertices(*t0)[0])
+
 def foster_vertices(n, t):
     s2, s3 = (n&2)-1, ((n&1)<<1)-1
     c = star_radius(10)
@@ -306,6 +377,46 @@ def foster_vertices(n, t):
     arc = (cp, bp, ap, a, b, c)
     vertices = [u*p for u in unitroots(15) for p in arc]
     return (vertices, abs(vertices[1] - vertices[82]) - 1)
+
+def f80a(t=1.39):
+    """Return a unit-distance embedding of the F80A graph."""
+    u20 = unitroots(20)
+    z0 = star_radius(20, 7)
+    r0 = [z0*u for u in u20]
+    z1 = z0 + expj(t)
+    r1 = [z1*u for u in u20]
+    z2 = cu(r1[2], r1[0])
+    r2 = [z2*u for u in u20]
+    z3 = cu(0, z2, star_radius(20, 3), 1)
+    r3 = [z3*u for u in u20]
+    vertices = r0 + r1 + r2 + r3
+    edges = ring_edges(20, ((0, 0, 7), (0, 1, 0), (2, 1, 0), (2, 1, 2), (2, 3, 0), (3, 3, 3)))
+    return (vertices, edges)
+
+def f84a_vertices(p2, a, b, c):
+    u7 = unitroots(7)
+    p0 = star_radius(7)
+    p1 = p0 + 1
+    p3 = p2 + 1 # has a sign variation
+    p4 = cu(p2, u7[3]*p1)
+    p5 = mpc(a, 0.5)
+    p6 = mpc(b, 0.5)
+    p7 = mpc(c, 0.5)
+    d1 = abs(p3 - u7[4]*p5)**2 - 1
+    d2 = abs(p4 - u7[2]*p7)**2 - 1
+    d3 = abs(p5 - u7[4]*conj(p6))**2 - 1
+    d4 = abs(p6 - u7[-1]*p7)**2 - 1
+    vertices = [u*p for u in u7 for p in (p0, p1, p2, p3, p4, p5, p6, p7)]
+    vertices.extend([u*conj(p) for u in u7 for p in (p4, p5, p6, p7)])
+    vertices = list(map(lambda z: z*1j, vertices))
+    return (vertices, (d1, d2, d3, d4))
+
+def f84a():
+    """Return a unit-distance embedding of the F84A graph - not degenerate
+    despite its looks. The graph is notable in having the simple PSL(2,8)
+    as its automorphism group."""
+    t0 = findroot(lambda *t: f84a_vertices(*t)[1], (-0.46, -1.44, 0.25, 0.75))
+    return all_unit_distances(f84a_vertices(*t0)[0])
 
 def foster(i=5):
     """Return any one of six (depending on 0 <= i <= 5) unit-distance
