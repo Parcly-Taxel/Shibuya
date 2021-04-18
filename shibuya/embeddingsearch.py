@@ -6,19 +6,22 @@ from functools import reduce
 from shibuya.rigidity import jacobian
 
 def symmetry_data(sym, k):
-    """Given a symmetry type and index, return both the GAP code defining
-    that group as a finitely presented group and a mapping from generators
-    to transformations of the Euclidean plane."""
+    """Given a symmetry type and index, return the GAP code defining
+    that group as a finitely presented group, a mapping from generators
+    to transformations of the Euclidean plane and a string describing
+    allowed orbit sizes."""
     symtype, n = sym[0], int(sym[1:])
     shifts = unitroots(n, True)
     if symtype == "C":
         gap_string = f"F := FreeGroup(1);\nH := F / [F.1^{n}];"
         ops = {1: lambda z: z*shifts[k], -1: lambda z: z/shifts[k]}
+        orbit_string = f"{n}"
     else:
         gap_string = f"F := FreeGroup(2);\nH := F / [F.1^{n}, F.2^2, (F.1*F.2)^2];"
         ops = {1: lambda z: z*shifts[k], -1: lambda z: z/shifts[k],
                2: conj, -2: conj}
-    return (gap_string, ops)
+        orbit_string = f"{n}, {2*n}"
+    return (gap_string, ops, orbit_string)
 
 def embedding_functions(edges, sym, k, gap_path):
     """Given an edge list representing a graph, a desired symmetry and
@@ -30,7 +33,7 @@ def embedding_functions(edges, sym, k, gap_path):
     An embedding object is a tuple (automorphism table, function realising embedding,
     number of variables, number of constraints)."""
     digraph_edges = [[a+1,b+1][::s] for (a, b) in edges for s in (1, -1)]
-    freegroup_def, ops = symmetry_data(sym, k)
+    freegroup_def, ops, orbit_sizes = symmetry_data(sym, k)
     program = f"""LoadPackage("digraphs");
 Gr := DigraphByEdges({digraph_edges});
 G := AutomorphismGroup(Gr);
@@ -38,9 +41,9 @@ G := AutomorphismGroup(Gr);
 sH := Size(H);
 for hom in IsomorphicSubgroups(G, H) do
     rings := Orbits(Image(hom));
-    #if not ForAll(rings, ring -> Length(ring) = sH) then
-    #    continue;
-    #fi;
+    if not ForAll(rings, ring -> Length(ring) in [ {orbit_sizes} ]) then
+        continue;
+    fi;
     seeds := List(rings, ring -> Minimum(ring));
     for aut in H do
         LR := LetterRepAssocWord(Factorization(H, aut));
