@@ -384,7 +384,32 @@ def f72a():
     t0 = findroot(lambda t: f72a_vertices(t)[1], 2.2)
     return all_unit_distances(f72a_vertices(t0)[0])
 
-# TODO F74A
+def f74a_vertices(*params):
+    u6 = unitroots(6)
+    tree = [1j, 2j, 2j-expj(-pi/6), 2j+expj(pi/6)]
+    params = [-1.04, 3.92] + list(params)
+    for (i, v) in enumerate((2, 3, 4, 5, 5, 6, 7)):
+        tree.append(tree[v] + expj(params[i]))
+    star = mpc(params[-2], params[-1])
+    cc1 = circumcentre(tree[8],       star,       -tree[9])
+    cc2 = circumcentre(u6[2]*tree[8], star, -u6[2]*tree[9])
+    cc3 = circumcentre(u6[4]*tree[8], star, -u6[4]*tree[9])
+    cons = (abs(tree[6] - u6[1]*tree[8])**2 - 1,
+            abs(tree[4] - tree[7])**2 - 1,
+            abs(tree[9] + tree[10])**2 - 1,
+            4*abs(tree[10])**2 - 1,
+            abs(star - cc1)**2 - 1,
+            abs(star - cc2)**2 - 1,
+            abs(star - cc3)**2 - 1)
+    vertices = [u*t for u in u6 for t in tree]
+    vertices.extend(s*v for s in (1, -1) for v in (star, cc1, cc2, cc3))
+    return (vertices, cons)
+
+def f74a():
+    """Return a unit-distance embedding of the F74A graph."""
+    t0 = [2.91, 4.74, 5.5, 4.88, 5, -0.05, 0.07]
+    t0 = findroot(lambda *t: f74a_vertices(*t)[1], t0)
+    return all_unit_distances(f74a_vertices(*t0)[0])
 
 def f78a_vertices(a, b, c):
     u13 = unitroots(13)
@@ -443,6 +468,34 @@ def f84a():
     t0 = findroot(lambda *t: f84a_vertices(*t)[1], (-0.46, -1.44, 0.25, 0.75))
     return all_unit_distances(f84a_vertices(*t0)[0])
 
+def f86a_vertices(*params):
+    u6 = unitroots(6)
+    tree = [1j, 2j, 2j-expj(-pi/6), 2j+expj(pi/6)]
+    params = [5.24451, 5.34434, 5.00597] + list(params)
+    for (i, v) in enumerate((2, 3, 4, 5, 5, 6, 7, 8, 9)):
+        tree.append(tree[v] + expj(params[i]))
+    star = mpc(params[-2], params[-1])
+    cc1 = circumcentre(tree[10],       star,       tree[11])
+    cc2 = circumcentre(u6[2]*tree[10], star, u6[2]*tree[11])
+    cc3 = circumcentre(u6[4]*tree[10], star, u6[4]*tree[11])
+    cons = (abs(tree[6] - u6[1]*tree[8])**2 - 1,
+            abs(tree[4] - tree[7])**2 - 1,
+            abs(tree[12] - tree[10])**2 - 1,
+            4*abs(tree[9])**2 - 1,
+            abs(tree[12] - u6[4]*tree[11])**2 - 1,
+            abs(star - cc1)**2 - 1,
+            abs(star - cc2)**2 - 1,
+            abs(star - cc3)**2 - 1)
+    vertices = [u*t for u in u6 for t in tree]
+    vertices.extend(s*v for s in (1, -1) for v in (star, cc1, cc2, cc3))
+    return (vertices, cons)
+
+def f86a():
+    """Return a unit-distance embedding of the F86A graph."""
+    t0 = [3.60383, 3.44007, 4.34048, 5.63174, 3.26345, 0.488743, 0.113378, 0.236693]
+    t0 = findroot(lambda *t: f86a_vertices(*t)[1], t0)
+    return all_unit_distances(f86a_vertices(*t0)[0])
+
 def foster_vertices(n, t):
     s2, s3 = (n&2)-1, ((n&1)<<1)-1
     c = star_radius(10)
@@ -484,6 +537,92 @@ def foster_old():
     edges = ring_edges(15, ((0, 1, 0), (1, 2, 0), (2, 3, 0), (3, 4, 0), (4, 5, 0), (5, 0, -1),
                             (0, 5, -2), (2, 3, -6), (4, 1, -2)))
     return (vertices, edges)
+
+def f96a_vertices(a):
+    u12 = unitroots(12)
+    p1 = a+0.5j
+    p2 = 2.3+0.5j
+    p3 = cu(u12[-1]*p1, p2) # ring 3
+    p4 = cu(p2, u12[1]*p1) # ring 2
+    vertices = [u*p for u in u12 for p in (p1, p2, p3, p4)]
+    vertices.extend([conj(p) for p in vertices])
+    return (vertices, abs(p3 - u12[3]*conj(p4)) - 1)
+
+def f96a():
+    """Return a unit-distance embedding of the F96A graph."""
+    a0 = findroot(lambda a: f96a_vertices(a)[1], 0.7)
+    return all_unit_distances(f96a_vertices(a0)[0])
+
+def f96b(a=2.32, b=1.92, c=-0.26, s1=-1, s2=1, s3=1, s4=-1):
+    """Return a unit-distance embedding of the F96B graph."""
+    u12 = unitroots(12)
+    z2 = star_radius(12, 5)
+    r2 = [u*z2 for u in u12]
+    z3 = z2 + expj(a)
+    r3 = [u*z3 for u in u12]
+    z1 = z3 + expj(b)
+    r1 = [u*z1 for u in u12]
+    z4 = cu(*(u12[3]*z1, z3)[::s1])
+    r4 = [u*z4 for u in u12]
+    z5 = z1 + expj(c)
+    r5 = [u*z5 for u in u12]
+    z6 = cu(*(u12[-5]*z5, z4)[::s2])
+    r6 = [u*z6 for u in u12]
+    z8 = cu(*(u12[-4]*z6, z5)[::s3])
+    r8 = [u*z8 for u in u12]
+    z7 = cu(z8, 0, 1, star_radius(12)) if s4 == 1 else cu(0, z8, star_radius(12), 1)
+    r7 = [u*z7 for u in u12]
+    vertices = r1 + r2 + r3 + r4 + r5 + r6 + r7 + r8
+    edges = ring_edges(12, ((1, 1, 5), (1, 2, 0), (2, 0, 0), (3, 0, 3),
+                            (3, 2, 0), (4, 0, 0), (5, 4, -5), (5, 3, 0),
+                            (7, 5, -4), (7, 4, 0), (6, 7, 0), (6, 6, 1)))
+    return (vertices, edges)
+
+def f98a_vertices(a, t2, t3, t4, t5):
+    u7 = unitroots(7)
+    p1 = mpc(a, 0.5)
+    p6 = 1.81+0.5j
+    p7 = 2.18+0.5j
+    p2 = p1 + expj(t2)
+    p3 = p6 + expj(t3)
+    p4 = p7 + expj(t4)
+    p5 = p7 + expj(t5)
+    cons = (abs(p1 - u7[3]*conj(p4))**2 - 1,
+            abs(p2 - u7[-2]*conj(p3))**2 - 1,
+            abs(p2 - u7[3]*p5)**2 - 1,
+            abs(p3 - u7[-1]*p5)**2 - 1,
+            abs(p4 - u7[1]*conj(p6))**2 - 1)
+    vertices = [u*p for u in u7 for p in (p1, p2, p3, p4, p5, p6, p7)]
+    vertices.extend([conj(p) for p in vertices])
+    return (vertices, cons)
+
+def f98a():
+    """Return a unit-distance embedding of the F98A graph."""
+    t0 = findroot(lambda *t: f98a_vertices(*t)[1], (-0.075, -2.3, -2.5, -2.8, -2.5))
+    return all_unit_distances(f98a_vertices(*t0)[0])
+
+def f98b_vertices(a, t1, t2, t3, t4):
+    u7 = unitroots(7)
+    p2 = -0.19+0.5j
+    p3 = 0.577+0.5j
+    p4 = mpc(a, 0.5)
+    p7 = p2 + expj(t1)
+    p5 = p3 + expj(t2)
+    p1 = p3 + expj(t3)
+    p6 = p4 + expj(t4)
+    cons = (abs(p1 - u7[-1]*conj(p5))**2 - 1,
+            abs(p1 - u7[-2]*conj(p6))**2 - 1,
+            abs(p2 - u7[-3]*conj(p4))**2 - 1,
+            abs(p5 - u7[-2]*conj(p7))**2 - 1,
+            abs(p6 - u7[3]*conj(p7))**2 - 1)
+    vertices = [u*p for u in u7 for p in (p1, p2, p3, p4, p5, p6, p7)]
+    vertices.extend([conj(p) for p in vertices])
+    return (vertices, cons)
+
+def f98b():
+    """Return a unit-distance embedding of the F98B graph."""
+    t0 = findroot(lambda *t: f98b_vertices(*t)[1], (0.95, 2.16, 2.38, -2.73, 2.23))
+    return all_unit_distances(f98b_vertices(*t0)[0])
 
 def biggssmith():
     """Return a unit-distance embedding of the Biggs–Smith graph (F102A)."""
