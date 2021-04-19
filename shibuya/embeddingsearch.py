@@ -3,7 +3,7 @@ from os.path import expanduser
 from subprocess import run
 from tempfile import NamedTemporaryFile
 from functools import reduce
-from shibuya.rigidity import jacobian
+from shibuya.rigidity import findroot_svd
 
 def symmetry_data(sym, k):
     """Given a symmetry type and index, return the GAP code defining
@@ -124,24 +124,10 @@ def embedding_run(E, sym, k, conclass, gap_path, succount=6, normlimit=1e-12,
         print(f"[{i}] -> {quad[0]} ({quad[2]} vars, {quad[3]} cons)")
     table, f, nv, nc = funcs[conclass]
     s = 0
-    zfloor = eps * max(nv, nc)
     while s < succount:
         try:
-            # For maximum robustness, manually implemented Newton's method
-            # with pseudoinverse calculation
             x = [coordrange*(2*rand()-1) for _ in range(nv)]
-            for _ in range(maxsteps):
-                U, S1, V = svd(jacobian(lambda *xx: f(*xx)[1], x))
-                tol = zfloor * max(S1)
-                S2 = diag([1/z if z >= tol else 0 for z in S1])
-                F = -matrix(f(*x)[1])
-                delta = V.T * S2 * U.T * F
-                x = [a + b for (a, b) in zip(x, delta)]
-                if norm(delta) <= 1e-12:
-                    break
-            if norm(matrix(f(*x)[1])) >= normlimit:
-                print("N")
-                continue
+            x = findroot_svd(lambda *xx: f(*xx)[1], x, maxsteps, normlimit)
             G = (f(*x)[0], E)
             if beauty_factor(G) >= beautylimit:
                 yield (G, x)
@@ -149,4 +135,5 @@ def embedding_run(E, sym, k, conclass, gap_path, succount=6, normlimit=1e-12,
             else:
                 print("B")
         except ValueError:
+            print("N")
             continue

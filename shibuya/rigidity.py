@@ -1,4 +1,4 @@
-from mpmath import re, im, zeros, diff
+from mpmath import *
 
 def rigidity_matrix(graph):
     """Return the rigidity matrix of the given graph.
@@ -25,3 +25,25 @@ def jacobian(f, x0):
             dvec = tuple(int(k == j) for k in range(n))
             J[i,j] = diff(fi, x0, dvec)
     return J
+
+def findroot_svd(f, x0, maxsteps=20, normlimit=1e-12):
+    """Find a root of f using Newton's method starting from x0,
+    using the SVD to solve the linear system for robustness.
+    maxsteps has the same meaning as in findroot(); the final
+    result must satisfy norm(f(x*))^2 <= normlimit to be accepted."""
+    x = list(x0)
+    n, m = len(x), len(f(*x))
+    zfloor = eps * max(m,n)
+    for _ in range(maxsteps):
+        U, S1, V = svd(jacobian(f, x))
+        tol = zfloor * max(S1)
+        S2 = diag([1/z if z >= tol else 0 for z in S1])
+        F = -matrix(f(*x))
+        delta = V.T * S2 * U.T * F
+        x = [a + b for (a, b) in zip(x, delta)]
+        if norm(delta) <= 1e-12:
+            break
+    fx = f(*x)
+    if fdot(fx, fx) >= normlimit:
+        raise ValueError(f"no convergence in {maxsteps} steps")
+    return x
