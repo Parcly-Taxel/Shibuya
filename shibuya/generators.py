@@ -73,6 +73,14 @@ def ring_edges(n, triples):
         L.extend([(i+a*n, (i+k)%n + b*n) for i in range(limit)])
     return L
 
+def symmetrise(vertices, sym):
+    """Return all images of the vertices under the specified symmetry,
+    where for dihedral symmetries there is a reflection on the real axis."""
+    res = [u*v for v in vertices for u in unitroots(int(sym[1:]))]
+    if sym[0] == "D":
+        res.extend([conj(v) for v in res])
+    return res
+
 def lcf_edges(n, pattern):
     """Return edges corresponding to the LCF notation [pattern]^(n/len(pattern))."""
     res = ring_edges(n, [(0, 0, 1)])
@@ -92,6 +100,29 @@ def all_unit_distances(vertices, tol=1e-12):
             if almosteq(abs(vertices[i]-vertices[j]), 1, tol):
                 edges.append((i, j))
     return (vertices, edges)
+
+def fixparams_unitdist(*x0, edgefunc=all_unit_distances):
+    """This decorator factory is applied to a parametrised function returning a pair (vertices, constraints)
+    where the constraints have to be all zero for the embedding to satisfy some certain property,
+    typically unit-distanceness (the default; the keyword argument edgefunc changes this).
+    Its arguments are the initial approximations to said parameters.
+
+    If a dictionary is the first argument, the decorated function accepts an index into
+    this dictionary mapping to initial approximations."""
+    d = x0[0]
+    if isinstance(d, dict):
+        def deco(f):
+            def makegraph(i):
+                xstar = findroot(lambda *x: f(*x)[1], d[i])
+                return edgefunc(f(*xstar)[0])
+            return makegraph
+        return deco
+    def deco(f):
+        def makegraph():
+            xstar = findroot(lambda *x: f(*x)[1], x0)
+            return edgefunc(f(*xstar)[0])
+        return makegraph
+    return deco
 
 def delete_vertices(graph, dverts):
     """Delete the vertices indexed by dverts from graph; return the resulting graph."""
