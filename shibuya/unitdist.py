@@ -2,7 +2,7 @@
 Other unit-distance graphs...
 """
 from mpmath import *
-from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances, delete_vertices
+from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances
 
 def tietze():
     """Return a unit-distance embedding of Tietze's graph."""

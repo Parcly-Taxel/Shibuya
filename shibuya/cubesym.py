@@ -5,6 +5,7 @@ from mpmath import *
 from functools import reduce
 from shibuya.generators import cu, star_radius, ring_edges, lcf_edges
 from shibuya.generators import all_unit_distances, circumcentre
+from shibuya.generators import fixparams_unitdist, symmetrise
 
 # F4A = tetrahedron() or complete(4) (not unit-distance)
 # F6A = circulant(6, (1, 3)) or mobiusladder(3) (not unit-distance)
@@ -78,27 +79,18 @@ def coxeter():
     edges = ring_edges(7, ((0, 0, 2), (1, 1, 3), (3, 3, 1), (0, 2, 0), (1, 2, -3), (2, 3, 0)))
     return (vertices, edges)
 
-def tutte8_vertices(x):
-    u5 = unitroots(5)
-    r0 = [u*0.25j for u in u5]
-    r1 = [-u*x*1j for u in u5]
-    z2 = cu(r0[2], r0[4])
-    r2 = [z2*u for u in u5]
-    z3 = cu(r0[3], r1[1])
-    r3 = [z3*u for u in u5]
-    z4 = cu(r1[4], r1[3])
-    r4 = [z4*u for u in u5]
-    z5 = cu(r3[0], r2[0])
-    r5 = [z5*u for u in u5]
-    return (r0 + r1 + r2 + r3 + r4 + r5, abs(z4-z5)-1)
-
-def tutte8():
-    """Return a unit-distance embedding of the Tutte 8-cage (F30A)."""
-    x0 = findroot(lambda x: tutte8_vertices(x)[1], [0.33, 0.34])
-    vertices = tutte8_vertices(x0)[0]
-    edges = ring_edges(5, ((0, 2, 1), (0, 2, 3), (0, 3, 2), (1, 3, 4), (1, 4, 1), (1, 4, 2),
-                           (2, 5, 0), (3, 5, 0), (4, 5, 0)))
-    return (vertices, edges)
+@fixparams_unitdist(-1.76, -0.76)
+def tutte8(a, b):
+    z1 = 1.69j
+    z2 = z1 + expj(a)
+    z3 = z2 + sign(-z2)
+    z4 = cu(z1*root(1,5,2), z1*root(1,5,-2))
+    d1 = abs(z3-z4) - 1
+    z5 = z2 + expj(b)
+    z6 = cu(z5*root(1,5,2), z5)
+    d2 = abs(z6-z3*root(1,5,1)) - 1
+    vertices = symmetrise((z1, z2, z3, z4, z5, z6), "C5")
+    return (vertices, (d1, d2))
 
 def dyck():
     """Return a unit-distance embedding of the Dyck graph (F32A)."""
@@ -601,28 +593,23 @@ def f98a():
     t0 = findroot(lambda *t: f98a_vertices(*t)[1], (-0.075, -2.3, -2.5, -2.8, -2.5))
     return all_unit_distances(f98a_vertices(*t0)[0])
 
-def f98b_vertices(a, t1, t2, t3, t4):
-    u7 = unitroots(7)
-    p2 = -0.19+0.5j
-    p3 = 0.577+0.5j
-    p4 = mpc(a, 0.5)
-    p7 = p2 + expj(t1)
-    p5 = p3 + expj(t2)
-    p1 = p3 + expj(t3)
-    p6 = p4 + expj(t4)
-    cons = (abs(p1 - u7[-1]*conj(p5))**2 - 1,
-            abs(p1 - u7[-2]*conj(p6))**2 - 1,
-            abs(p2 - u7[-3]*conj(p4))**2 - 1,
-            abs(p5 - u7[-2]*conj(p7))**2 - 1,
-            abs(p6 - u7[3]*conj(p7))**2 - 1)
-    vertices = [u*p for u in u7 for p in (p1, p2, p3, p4, p5, p6, p7)]
-    vertices.extend([conj(p) for p in vertices])
+@fixparams_unitdist(3.2, -2.5, 2.7, -2.7, -3.2)
+def f98b(a, b, c, d, e):
+    u = root(1, 7, 1)
+    z1 = 3.175+0.5j
+    z2 = z1+expj(a)
+    z3 = z1+expj(b)
+    z4 = z3+expj(c)
+    z5 = z3+expj(d)
+    z6 = z4+expj(e)
+    z7 = -0.0375+0.5j
+    cons = (abs(z2 - conj(z2)*u) - 1,
+            abs(z2 - z5*u) - 1,
+            abs(z4 - z7/u**2) - 1,
+            abs(z5 - z6/u) - 1,
+            abs(z6 - conj(z7)/u) - 1)
+    vertices = symmetrise((z1, z2, z3, z4, z5, z6, z7), "D7")
     return (vertices, cons)
-
-def f98b():
-    """Return a unit-distance embedding of the F98B graph."""
-    t0 = findroot(lambda *t: f98b_vertices(*t)[1], (0.95, 2.16, 2.38, -2.73, 2.23))
-    return all_unit_distances(f98b_vertices(*t0)[0])
 
 def biggssmith():
     """Return a unit-distance embedding of the Biggs–Smith graph (F102A)."""

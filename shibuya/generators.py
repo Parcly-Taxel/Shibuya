@@ -124,6 +124,17 @@ def fixparams_unitdist(*x0, edgefunc=all_unit_distances):
         return makegraph
     return deco
 
+def remove_edges(edgefunc):
+    """Decorator factory applied to a graph-producing function, removes edges whose indices
+    satisfy the given edge function."""
+    def deco(graphfunc):
+        def makegraph(*args, **kwargs):
+            G = graphfunc(*args, **kwargs)
+            Ep = list(filter(lambda e: not edgefunc(e), G[1]))
+            return (G[0], Ep)
+        return makegraph
+    return deco
+
 def delete_vertices(graph, dverts):
     """Delete the vertices indexed by dverts from graph; return the resulting graph."""
     vertices, edges = graph
