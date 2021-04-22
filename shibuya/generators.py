@@ -103,12 +103,20 @@ def all_unit_distances(vertices, tol=1e-12):
 
 def fixparams_unitdist(*x0, edgefunc=all_unit_distances):
     """This decorator factory is applied to a parametrised function returning a pair (vertices, constraints)
-    where the constraints have to be all zero for the embedding to satisfy some certain property,
+    where the constraints have to be all zero for the embedding to satisfy some property,
     typically unit-distanceness (the default; the keyword argument edgefunc changes this).
     Its arguments are the initial approximations to said parameters.
 
     If a dictionary is the first argument, the decorated function accepts an index into
-    this dictionary mapping to initial approximations."""
+    this dictionary mapping to initial approximations. Passing no positional arguments
+    is a shorthand for a function that just returns vertices, indicating that edgefunc
+    should be applied and nothing more."""
+    if not x0:
+        def deco(f):
+            def makegraph():
+                return edgefunc(f())
+            return makegraph
+        return deco
     d = x0[0]
     if isinstance(d, dict):
         def deco(f):

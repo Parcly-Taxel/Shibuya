@@ -3,6 +3,7 @@ Other unit-distance graphs...
 """
 from mpmath import *
 from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances
+from shibuya.generators import fixparams_unitdist, symmetrise
 
 def tietze():
     """Return a unit-distance embedding of Tietze's graph."""
@@ -33,6 +34,17 @@ def flowersnark(n=5):
     vertices = r0 + r1 + r2 + r3
     edges = ring_edges(n, ((1, 0, 1), (1, 0, -1), (0, 2, 0), (1, 2, 0), (2, 3, 0), (3, 3, 1)))
     return (vertices, edges)
+
+@fixparams_unitdist()
+def smallest_zerosym():
+    """Return a unit-distance embedding of the smallest zero-symmetric graph
+    (vertex-transitive, edges are partitioned into three orbits), which has LCF
+    notation [5, -5]^9."""
+    a = polyroots([16, -16*sqrt(3), 32, 12*sqrt(3), -1])[0]
+    z1 = root(1, 12, 5)
+    z2 = mpc(a, 0.5)
+    z3 = cu(1j, z2)
+    return symmetrise((z1, z2, z3), "D3")
 
 def blanusa1():
     """Draws a unit-distance embedding of the first Blanuša snark."""
@@ -89,6 +101,31 @@ def franklin():
     edges = ring_edges(3, ((0, 1, 0), (0, 3, 1), (0, 3, -1), (1, 2, 0), (1, 2, -1), (2, 3, 0)))
     return (vertices, edges)
 
+def mcgee(mode=0):
+    """Return a unit-distance embedding of the McGee graph,
+    from https://math.stackexchange.com/q/1484002/357390. mode (0 or 1)
+    selects between two algebraically related forms."""
+    a = polyroots([1, 0, -129, -218])[mode]
+    t = polyroots([1, (a**2+3*a-52)/68, (a+3)/16])[1]
+    core = [u/2 for u in unitroots(8)]
+    z0 = mpc(0.5+t, -root(1-t**2, 2, mode))
+    z1 = cu(z0, core[1])
+    outer = [z*u for z in (z0, conj(z0), z1, conj(z1)) for u in unitroots(4)]
+    vertices = core + outer
+    return all_unit_distances(vertices)
+
+@fixparams_unitdist()
+def gray():
+    """Return a unit-distance embedding of the Gray graph, the smallest cubic
+    edge- but not vertex-transitive graph with LCF [-25, 7, -7, 13, -13, 25]^9."""
+    t2 = tan(pi/9)**2
+    pa = polyval([1/16, -17/8, 45/16], t2)
+    pb = polyval([1/8, -4, 15/8], t2)
+    pc = polyval([-3/16, 49/8, -27/16], t2)
+    triple = [pa, pb, pc]
+    line = [p-d for p in triple for d in (0, 1)]
+    return symmetrise(line, "C9")
+
 def harborth():
     """Return the canonical presentation of the Harborth graph. Based on Gerbracht (2007),
     Minimal Polynomials for the Coordinates of the Harborth Graph,
@@ -110,17 +147,4 @@ def harborth():
     quadrant = [A, B, C, D, E, F, G, H, J] + aux_points
     half = quadrant + [-p.conjugate() for p in quadrant if p.real > 0]
     vertices = half + [p.conjugate() for p in half if p.imag > 0]
-    return all_unit_distances(vertices)
-
-def mcgee(mode=0):
-    """Return a unit-distance embedding of the McGee graph,
-    from https://math.stackexchange.com/q/1484002/357390. mode (0 or 1)
-    selects between two algebraically related forms."""
-    a = polyroots([1, 0, -129, -218])[mode]
-    t = polyroots([1, (a**2+3*a-52)/68, (a+3)/16])[1]
-    core = [u/2 for u in unitroots(8)]
-    z0 = mpc(0.5+t, -root(1-t**2, 2, mode))
-    z1 = cu(z0, core[1])
-    outer = [z*u for z in (z0, conj(z0), z1, conj(z1)) for u in unitroots(4)]
-    vertices = core + outer
     return all_unit_distances(vertices)

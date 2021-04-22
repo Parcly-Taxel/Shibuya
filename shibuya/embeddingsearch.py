@@ -1,3 +1,7 @@
+"""
+Functions to automatically search for unit-distance embeddings of graphs.
+For maximal speed, NumPy is used.
+"""
 import numpy as np
 from math import gcd
 from os.path import expanduser
@@ -12,9 +16,9 @@ H := {1};
 
 for hom in IsomorphicSubgroups(G, H) do
     Ih := Image(hom);
-    rings := Orbits(Ih);
+    rings := Orbits(Ih, [1..DigraphNrVertices(Gr)]);
     if not ForAll(rings, ring -> Length(ring) in [ {2} ]) or
-            Number(rings, ring -> Length(ring) = 1) > 1 then
+            {3} and Number(rings, ring -> Length(ring) = 1) > 1 then
         continue;
     fi;
     seeds := List(rings, Minimum);
@@ -57,23 +61,20 @@ od;
 QUIT_GAP();
 """
 
-def symmetry_data(sym):
-    """Given a symmetry type, return the GAP code defining that group,
-    allowed orbit sizes (orders of site symmetry groups of Wyckoff positions)
-    and a function mapping indexes to realisations of the group in Euclidean space
-    (functions mapping external representations to orthogonal NumPy matrices)."""
-    symtype, n = sym[0], int(sym[1:])
-    cyclic_shifts = list(filter(lambda m: gcd(n,m) == 1, range(1, n//2+1)))
-    if symtype == "C":
-        groupdef = f"CyclicGroup(IsPermGroup, {n})"
-        orbit_sizes = [1, n]
-    else:
-        groupdef = f"DihedralGroup(IsPermGroup, {2*n})"
-        orbit_sizes = [1, n, 2*n]
-    def rindexer(k):
+def plane_dihedral_indexer(n):
+    if n == 1:
+        def indexer(k):
+            if k > 0:
+                raise IndexError("this is D1")
+            def rfunc(extrep):
+                return np.diag([1, (-1 if extrep else 1)])
+            return rfunc
+        return indexer
+    def indexer(k):
+        s = list(filter(lambda m: gcd(n,m) == 1, range(1, n//2+1)))[k]
+        base_theta = 2*s*np.pi/n
         def rfunc(extrep):
             A = np.eye(2)
-            base_theta = 2*cyclic_shifts[k]*np.pi/n
             for (g, times) in zip(*[iter(extrep)] * 2):
                 if g == 1:
                     s, c = np.sin(times*base_theta), np.cos(times*base_theta)
@@ -82,7 +83,37 @@ def symmetry_data(sym):
                     A = np.diag([1, -1]) @ A
             return A
         return rfunc
-    return (groupdef, orbit_sizes, rindexer)
+    return indexer
+
+def plane_cyclic_indexer(n):
+    def indexer(k):
+        s = list(filter(lambda m: gcd(n,m) == 1, range(1, n//2+1)))[k]
+        base_theta = 2*s*np.pi/n
+        def rfunc(extrep):
+            times = extrep[1] if extrep else 0
+            s, c = np.sin(times*base_theta), np.cos(times*base_theta)
+            return np.array([[c, -s], [s, c]])
+        return rfunc
+    return indexer
+
+def symmetry_data(sym):
+    """Given a symmetry type in Schoenflies notation, return a tuple of
+    (1) the GAP code defining that group
+    (2) allowed orbit sizes (orders of site symmetry groups of Wyckoff positions)
+    (3) a function mapping indexes to realisations of the group in Euclidean space
+    (functions mapping external representations to orthogonal NumPy matrices)
+    (4) whether the group's fixed point set is zero-dimensional, which allows
+    rejecting homomorphisms that fix more than one point"""
+    symtype, n = sym[0], int(sym[1:])
+    if symtype == "C":
+        groupdef = f"CyclicGroup(IsPermGroup, {n})"
+        orbit_sizes = [1, n]
+        indexer = plane_cyclic_indexer(n)
+    else:
+        groupdef = f"DihedralGroup(IsPermGroup, {2*n})"
+        orbit_sizes = [1, n, 2*n]
+        indexer = plane_dihedral_indexer(n)
+    return (groupdef, orbit_sizes, indexer, n > 1)
 
 def embedding_conclasses(edges, sym, gap_path):
     """Given a graph's edge list and a desired symmetry, return conjugacy classes
@@ -90,9 +121,10 @@ def embedding_conclasses(edges, sym, gap_path):
     a GAP instance at gap_path and the Digraphs package there.
     sym uses Schoenflies notation, e.g. C7 or D7."""
     digraph_edges = [[a+1,b+1][::s] for (a, b) in edges for s in (1, -1)]
-    groupdef, orbit_sizes, rfunc = symmetry_data(sym)
+    groupdef, orbit_sizes, indexer, fp0d = symmetry_data(sym)
     orbit_sizes = ", ".join(map(str, orbit_sizes))
-    program = conclasses_template.format(digraph_edges, groupdef, orbit_sizes)
+    fp0d = str(fp0d).lower()
+    program = conclasses_template.format(digraph_edges, groupdef, orbit_sizes, fp0d)
     with NamedTemporaryFile("w+", delete=False) as f:
         f.write(program)
     proc = run([expanduser(gap_path), "-q", f.name], capture_output=True, text=True)
@@ -101,7 +133,7 @@ def embedding_conclasses(edges, sym, gap_path):
         if not chunk:
             continue
         chunk = eval(chunk)
-        chunk.append(rfunc)
+        chunk.append(indexer)
         chunks.append(chunk)
     return chunks
 
@@ -147,6 +179,7 @@ def save_embeddings(E, symtype, gap_path):
                 k += 1
             except IndexError:
                 break
+    print("end of conjugacy classes")
 
 def load_test_embedding(symtype, cc, k, successes=np.inf, failures=np.inf,
         coordrange=3, maxsteps=20):
