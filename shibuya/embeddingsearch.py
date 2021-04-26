@@ -115,12 +115,17 @@ def symmetry_data(sym):
         indexer = plane_dihedral_indexer(n)
     return (groupdef, orbit_sizes, indexer, n > 1)
 
+def gap_digraph(edges):
+    """Given a 0-indexed list of edges, return a 1-indexed list of edges of
+    twice the length (i.e. a directed version) suitable for pasting into GAP."""
+    return [[a+1,b+1][::s] for (a, b) in edges for s in (1, -1)]
+
 def embedding_conclasses(edges, sym, gap_path):
     """Given a graph's edge list and a desired symmetry, return conjugacy classes
     of graph embeddings respecting said symmetry. This function depends on
     a GAP instance at gap_path and the Digraphs package there.
     sym uses Schoenflies notation, e.g. C7 or D7."""
-    digraph_edges = [[a+1,b+1][::s] for (a, b) in edges for s in (1, -1)]
+    digraph_edges = gap_digraph(edges)
     groupdef, orbit_sizes, indexer, fp0d = symmetry_data(sym)
     orbit_sizes = ", ".join(map(str, orbit_sizes))
     fp0d = str(fp0d).lower()

@@ -81,14 +81,16 @@ def symmetrise(vertices, sym):
         res.extend([conj(v) for v in res])
     return res
 
-def lcf_edges(n, pattern):
-    """Return edges corresponding to the LCF notation [pattern]^(n/len(pattern))."""
+def lcf_edges(n, *patterns):
+    """Return edges corresponding to the LCF notation [pattern]^(n/len(pattern)),
+    for each provided pattern. 0 can be used to indicate "no edge"."""
     res = ring_edges(n, [(0, 0, 1)])
-    p = len(pattern)
-    for i in range(n):
-        j = (i + pattern[i%p]) % n
-        if j > i:
-            res.append((i, j))
+    for pattern in patterns:
+        p = len(pattern)
+        for i in range(n):
+            j = (i + pattern[i%p]) % n
+            if j > i:
+                res.append((i, j))
     return res
 
 def all_unit_distances(vertices, tol=1e-12):

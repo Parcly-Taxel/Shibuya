@@ -21,12 +21,12 @@ def complete(n):
     """Return the complete graph on n vertices."""
     return circulant(n, range(1, n//2+1))
 
-def lcf_graph(n, pattern):
+def lcf_graph(n, *patterns):
     """Return the graph with the given LCF notation; the number of repeats is implied.
     Vertices are arranged in a circle."""
     r = star_radius(n)
     vertices = [r*u for u in unitroots(n)]
-    return (vertices, lcf_edges(n, pattern))
+    return (vertices, lcf_edges(n, *patterns))
 
 def mobiusladder(n=3):
     """Return the Möbius ladder on 2n vertices. The n = 3 case corresponds

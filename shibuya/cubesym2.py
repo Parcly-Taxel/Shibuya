@@ -101,3 +101,29 @@ def f114a(a, b, c):
     d3 = abs(p3 - conj(p1)*u[-8]) - 1
     vertices = symmetrise((p1, p2, p3), "D19")
     return (vertices, (d1, d2, d3))
+
+@fixparams_unitdist(0.72, -0.22)
+def f120a(a, b):
+    u = unitroots(10)
+    p1 = rect(0.5, 1.646)
+    p2 = -conj(p1)
+    p4 = mpc(0.2425, a)
+    p7 = -0.0616 + 1.128j
+    p3 = cu(p1, u[2]*p7)
+    p5 = cu(p1, u[1]*p4)
+    p6 = cu(p2, u[-3]*p4)
+    p9 = cu(p7, p2)
+    p12 = cu(p6, u[-2]*p9)
+    p10 = cu(0, p12, star_radius(10), 1)
+    p8 = p4 + expj(b)
+    p11 = cu(p8, u[-2]*p8)
+    vertices = symmetrise((p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12), "C10")
+    return (vertices, (abs(p5 - u[1]*p3) - 1, abs(p7 - u[2]*p11) - 1))
+
+@fixparams_unitdist()
+def f120b():
+    p1 = star_radius(30, 13)
+    p2 = p1 + expj(2.6895)
+    p3 = cu(root(1,5,2)*p2, p2)
+    p4 = cu(0, p3, star_radius(30, 7), 1)
+    return symmetrise((p1, p2, p3, p4), "C30")
