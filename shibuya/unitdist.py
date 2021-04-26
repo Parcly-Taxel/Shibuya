@@ -5,6 +5,16 @@ from mpmath import *
 from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances
 from shibuya.generators import fixparams_unitdist, symmetrise
 
+def franklin():
+    """Return a unit-distance embedding of the Franklin graph."""
+    s2 = polyroots([9, -15, 16, -15, 9])[1]
+    s3 = sqrt(3) * 1j
+    s1 = cu(s2, s3)
+    third = [v - s3/3 for v in (s3, s1, s2, 0)]
+    vertices = [v*u for v in third for u in unitroots(3)]
+    edges = ring_edges(3, ((0, 1, 0), (0, 3, 1), (0, 3, -1), (1, 2, 0), (1, 2, -1), (2, 3, 0)))
+    return (vertices, edges)
+
 def tietze():
     """Return a unit-distance embedding of Tietze's graph."""
     t = (13*sqrt(3) + sqrt(13 * (40*sqrt(3)-9))) / 52
@@ -17,22 +27,6 @@ def tietze():
     edges = [(0, 1), (1, 2), (2, 3), (0, 4), (3, 5), (2, 7),
              (4, 5), (5, 6), (6, 7), (4, 8), (7, 9), (6, 11),
              (8, 9), (9, 10), (10, 11), (8, 0), (11, 1), (10, 3)]
-    return (vertices, edges)
-
-def flowersnark(n=5):
-    """Return a unit-distance embedding of the flower snark J_n,
-    where n is an odd number at least 5."""
-    un = unitroots(n)
-    s0 = 2*star_radius(n, 2)
-    r0 = [s0*u for u in un]
-    s1 = r0[1].real
-    r1 = [s1*u for u in un]
-    z2 = cu(s1, s0)
-    r2 = [z2*u for u in un]
-    z3 = cu(0, z2, star_radius(n), 1)
-    r3 = [z3*u for u in un]
-    vertices = r0 + r1 + r2 + r3
-    edges = ring_edges(n, ((1, 0, 1), (1, 0, -1), (0, 2, 0), (1, 2, 0), (2, 3, 0), (3, 3, 1)))
     return (vertices, edges)
 
 @fixparams_unitdist()
@@ -91,14 +85,20 @@ def blanusa2(t=pi/3):
     edges -= {(0, 8), (1, 9), (2, 10), (3, 11), (4, 12), (7, 15)}
     return (vertices, edges)
 
-def franklin():
-    """Return a unit-distance embedding of the Franklin graph."""
-    s2 = polyroots([9, -15, 16, -15, 9])[1]
-    s3 = sqrt(3) * 1j
-    s1 = cu(s2, s3)
-    third = [v - s3/3 for v in (s3, s1, s2, 0)]
-    vertices = [v*u for v in third for u in unitroots(3)]
-    edges = ring_edges(3, ((0, 1, 0), (0, 3, 1), (0, 3, -1), (1, 2, 0), (1, 2, -1), (2, 3, 0)))
+def flowersnark(n=5):
+    """Return a unit-distance embedding of the flower snark J_n,
+    where n is an odd number at least 5."""
+    un = unitroots(n)
+    s0 = 2*star_radius(n, 2)
+    r0 = [s0*u for u in un]
+    s1 = r0[1].real
+    r1 = [s1*u for u in un]
+    z2 = cu(s1, s0)
+    r2 = [z2*u for u in un]
+    z3 = cu(0, z2, star_radius(n), 1)
+    r3 = [z3*u for u in un]
+    vertices = r0 + r1 + r2 + r3
+    edges = ring_edges(n, ((1, 0, 1), (1, 0, -1), (0, 2, 0), (1, 2, 0), (2, 3, 0), (3, 3, 1)))
     return (vertices, edges)
 
 def mcgee(mode=0):
@@ -113,6 +113,15 @@ def mcgee(mode=0):
     outer = [z*u for z in (z0, conj(z0), z1, conj(z1)) for u in unitroots(4)]
     vertices = core + outer
     return all_unit_distances(vertices)
+
+@fixparams_unitdist()
+def holt():
+    """Return the unique non-degenerate unit-distance embedding of the Holt graph,
+    the smallest half-transitive graph, with D9 symmetry."""
+    def r(i):
+        t = 4*cos(2**i*pi/9)**2
+        return sqrt(polyroots([1, 1-t, t, -t/3])[0])
+    return symmetrise((r(0), -r(1), -r(2)), "C9")
 
 @fixparams_unitdist()
 def gray():
