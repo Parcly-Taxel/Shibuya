@@ -157,3 +157,15 @@ def harborth():
     half = quadrant + [-p.conjugate() for p in quadrant if p.real > 0]
     vertices = half + [p.conjugate() for p in half if p.imag > 0]
     return all_unit_distances(vertices)
+
+@fixparams_unitdist()
+def balaban10():
+    """Return a unit-distance embedding of the Balaban 10-cage."""
+    p1 = 0.5j
+    p2 = 0.8
+    p3 = -abs(cu(root(1,5,2)*p2, p2))
+    p4 = cu(p1, p2)
+    p5 = cu(p3, p1)
+    p6 = cu(p4, 0, 1, star_radius(10))
+    p7 = cu(0, p5, star_radius(10), 1)
+    return symmetrise((p1, p2, p3, p4, p5, p6, p7), "C10")
