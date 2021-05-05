@@ -1,9 +1,10 @@
 """
-The graphs here represent skeletons of polyhedra. If the graph is cubic then it likely has
-a unit-distance embedding; if there are multiple higher-degree vertices it likely doesn't.
+Skeletons of polyhedra. If the graph is cubic then it likely has a unit-distance embedding;
+if there are multiple higher-degree vertices it likely doesn't.
 """
-from mpmath import sqrt, root, unitroots, polyroots
+from mpmath import *
 from shibuya.generators import cu, ring_edges, star_radius
+from shibuya.generators import fixparams_unitdist, symmetrise, remove_edges
 
 def tetrahedron():
     """Return the integral embedding of the tetrahedral graph with shortest
@@ -54,43 +55,60 @@ def icosahedron():
              (7, 11), (8, 9), (8, 10), (9, 10), (9, 11), (10, 11))
     return (vertices, edges)
 
-def truncated_tetrahedron():
+@fixparams_unitdist()
+def truntet():
     """Return a unit-distance embedding of the truncated tetrahedron graph."""
-    u4 = unitroots(4)
-    z0 = sqrt(polyroots([1, -4+4j, -4j, 4+4j, -1])[1]) / 2
-    r0 = [z0*u for u in u4]
-    z1 = cu((-z0*1j).conjugate(), z0)
-    r1 = [z1*u for u in u4]
-    z2 = cu(-z0.conjugate(), z0)
-    r2 = [z2*u for u in u4]
-    vertices = r0 + r1 + r2
-    edges = ring_edges(4, ((0, 0, 2), (0, 1, 0), (0, 2, 0), (1, 2, 0), (1, 2, -1)))
-    return (vertices, edges)
+    b = sqrt(sqrt(3)-sqrt(4*sqrt(3)-5)) / 2
+    z0 = mpc(sqrt(1-b**2), b) / 2
+    z1 = cu(conj(z0)*1j, z0)
+    z2 = cu(-conj(z0), z0)
+    return symmetrise((z0, z1, z2), "C4")
 
-def truncated_cube():
+@remove_edges(lambda e: e[0]//6 == e[1]//6 == 2)
+@fixparams_unitdist()
+def truncube():
     """Return a unit-distance embedding of the truncated cube graph."""
-    s1 = root(1, 12, 1)
-    s2 = s1 + 1
-    s3 = s1 + root(1, 6, 1)
-    s4 = cu(s1, 0, 1, star_radius(3))
-    u6 = unitroots(6)
-    r1 = [s1*u for u in u6]
-    r2 = [s2*u for u in u6]
-    r3 = [s3*u for u in u6]
-    r4 = [s4*u for u in u6]
-    vertices = r1 + r2 + r3 + r4
-    edges = ring_edges(6, ((0, 1, 0), (0, 2, 0), (1, 2, 0), (2, 1, 1), (3, 3, 2), (0, 3, 0)))
-    return (vertices, edges)
+    z0 = 1j + root(1,6,1)
+    z1 = 1j + root(1,3,1)
+    z3 = cu(1j, 0, 1, star_radius(3))
+    return symmetrise((z0, z1, 1j, z3), "C6")
 
-def bidiakis_cube():
+@remove_edges(lambda e: e[0]//6 == e[1]//6 == 0)
+@fixparams_unitdist()
+def trunoct():
+    """Return a unit-distance embedding of the truncated octahedron graph."""
+    z0 = star_radius(3)*1j
+    z1 = 2*z0
+    a = (sqrt(33)-3) / 12
+    z2 = z0 + mpc(a, sqrt(1-a**2))
+    z3 = z2 + 1
+    return symmetrise((z0, z1, z2, z3), "C6")
+
+@fixparams_unitdist(-2.28)
+def trundodec(a):
+    """Return a unit-distance embedding of the truncated dodecahedron graph."""
+    p0 = star_radius(20)*root(1,40,1)
+    p1 = star_radius(20)*root(1,40,3)
+    p2 = cu(p0, p1)
+    p3 = p2 + expj(a)
+    p4 = p3 - 1
+    p5 = cu(p3, p4)
+    return (symmetrise((p0, p1, p2, p3, p4, p5), "D5"), [abs(p4 - root(1,5,1)*p5) - 1])
+
+@fixparams_unitdist(3.22)
+def trunicos(b):
+    """Return a unit-distance embedding of the truncated icosahedron graph."""
+    p0 = star_radius(5)*root(1,20,1)
+    p1 = p0 + root(1,20,1)
+    p2 = mpc(b, 0.5)
+    p3 = cu(p2, p1)
+    p4 = cu(p3, p1*root(1,5,-1))
+    p5 = cu(p4, p2*root(1,5,-1))
+    return (symmetrise((p0, p1, p2, p3, p4, p5), "D5"),
+            [abs(p5 - root(1,5,-1)*conj(p5)) - 1])
+
+@fixparams_unitdist()
+def bidiakis():
     """Return a unit-distance embedding of the bidiakis cube."""
-    w6 = root(1, 6, 1)
-    w8 = root(1, 8, 1)
-    house = (0, 1j, w6, w6+1j, 1, 1+1j)
-    house_edges = [(0, 1), (2, 3), (4, 5), (0, 2), (2, 4), (1, 3), (3, 5)]
-    left_house = [v*w8 for v in house]
-    right_house = [(v-1)*w8.conjugate() + 1 for v in house]
-    right_house_edges = [(a + 6, b + 6) for (a, b) in house_edges]
-    vertices = left_house + right_house
-    edges = house_edges + right_house_edges + [(1, 6), (4, 11), (5, 7), (0, 10)]
-    return (vertices, edges)
+    a = (-sqrt(7)+3j) / 4
+    return symmetrise((0.5, a+0.5, a-0.5), "C4")
