@@ -570,28 +570,18 @@ def f96b(a=2.32, b=1.92, c=-0.26, s1=-1, s2=1, s3=1, s4=-1):
                             (7, 5, -4), (7, 4, 0), (6, 7, 0), (6, 6, 1)))
     return (vertices, edges)
 
-def f98a_vertices(a, t2, t3, t4, t5):
-    u7 = unitroots(7)
-    p1 = mpc(a, 0.5)
-    p6 = 1.81+0.5j
-    p7 = 2.18+0.5j
-    p2 = p1 + expj(t2)
-    p3 = p6 + expj(t3)
-    p4 = p7 + expj(t4)
-    p5 = p7 + expj(t5)
-    cons = (abs(p1 - u7[3]*conj(p4))**2 - 1,
-            abs(p2 - u7[-2]*conj(p3))**2 - 1,
-            abs(p2 - u7[3]*p5)**2 - 1,
-            abs(p3 - u7[-1]*p5)**2 - 1,
-            abs(p4 - u7[1]*conj(p6))**2 - 1)
-    vertices = [u*p for u in u7 for p in (p1, p2, p3, p4, p5, p6, p7)]
-    vertices.extend([conj(p) for p in vertices])
-    return (vertices, cons)
-
-def f98a():
-    """Return a unit-distance embedding of the F98A graph."""
-    t0 = findroot(lambda *t: f98a_vertices(*t)[1], (-0.075, -2.3, -2.5, -2.8, -2.5))
-    return all_unit_distances(f98a_vertices(*t0)[0])
+@fixparams_unitdist(1.43, 2.28)
+def f98a(a, b):
+    r = root(1,7,1)
+    p1 = 1.2+0.5j
+    p7 = 2.3+0.5j
+    p3 = mpc(a, -0.5)*sqrt(r)
+    p6 = cu(conj(p7)*r, p1)
+    p2 = (p1+expj(b))/r
+    p4 = conj(cu(p2, p3/r))
+    p5 = conj(cu(p2, p7))*r
+    cons = (abs(p3 - conj(p6)) - 1, abs(p4 - conj(p5)) - 1)
+    return (symmetrise((p1, p2, p3, p4, p5, p6, p7), "D7"), cons)
 
 @fixparams_unitdist(3.2, -2.5, 2.7, -2.7, -3.2)
 def f98b(a, b, c, d, e):

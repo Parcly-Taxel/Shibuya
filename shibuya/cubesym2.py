@@ -127,3 +127,22 @@ def f120b():
     p3 = cu(root(1,5,2)*p2, p2)
     p4 = cu(0, p3, star_radius(30, 7), 1)
     return symmetrise((p1, p2, p3, p4), "C30")
+
+# The two graphs below are the remaining symmetric graph expansions
+@fixparams_unitdist()
+def f204a():
+    p1 = 0.5289 + 1.4675j
+    p2 = 1 + p1
+    p3 = cu(0, p1, star_radius(34, 11), 1)
+    p4 = cu(0, p1, star_radius(34, 7), 1)
+    p5 = cu(0, p2, star_radius(34, 5), 1)
+    p6 = cu(0, p2, star_radius(34, 3), 1)
+    return symmetrise((p1, p2, p3, p4, p5, p6), "C34")
+
+@fixparams_unitdist()
+def f224c():
+    p1 = 1.4425
+    p2 = cu(0, p1, star_radius(56, 11), 1)
+    p3 = cu(p1, 0, 1, star_radius(56, 13))
+    p4 = cu(p1, 0, 1, star_radius(56, 5))
+    return symmetrise((p1, p2, p3, p4), "C56")
