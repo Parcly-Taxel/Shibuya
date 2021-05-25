@@ -403,22 +403,16 @@ def f74a():
     t0 = findroot(lambda *t: f74a_vertices(*t)[1], t0)
     return all_unit_distances(f74a_vertices(*t0)[0])
 
-def f78a_vertices(a, b, c):
-    u13 = unitroots(13)
+@fixparams_unitdist(-1.1, 1.6, 2.2)
+def f78a(a, b, c):
+    u = unitroots(13)
     pa = mpc(a, 0.5)
     pb = mpc(b, 0.5)
     pc = mpc(c, 0.5)
-    pac, pbc, pcc = (conj(p) for p in (pa, pb, pc))
-    d1 = abs(pa - u13[5]*pbc)**2 - 1
-    d2 = abs(pb - u13[2]*pcc)**2 - 1
-    d3 = abs(pc - u13[6]*pac)**2 - 1
-    vertices = [u*p for u in u13 for p in (pa, pb, pc, pac, pbc, pcc)]
-    return (vertices, (d1, d2, d3))
-
-def f78a():
-    """Return a unit-distance embedding of the F78A graph."""
-    t0 = findroot(lambda *t: f78a_vertices(*t)[1], (-1.1, 1.6, 2.2))
-    return all_unit_distances(f78a_vertices(*t0)[0])
+    d1 = abs(pa - u[5]*conj(pb))**2 - 1
+    d2 = abs(pb - u[2]*conj(pc))**2 - 1
+    d3 = abs(pc - u[6]*conj(pa))**2 - 1
+    return (symmetrise((pa, pb, pc), "D13"), (d1, d2, d3))
 
 def f80a(t=1.39):
     """Return a unit-distance embedding of the F80A graph."""

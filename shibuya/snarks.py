@@ -92,3 +92,18 @@ def szekeres(a, b, c, d):
     cons = (abs(p4 - u*u*p3) - 1, abs(p4 - u*p2) - 1,
             abs(p1 - u*u*p3) - 1, abs(p1 - conj(u*p2)) - 1)
     return (symmetrise((a, a-1), "C5") + symmetrise((p1, p2, p3, p4), "D5"), cons)
+
+@fixparams_unitdist(0.7)
+def watkins(a):
+    """Return a unit-distance embedding of the Watkins snark."""
+    p0 = 0.49-0.32j
+    p1 = (p0-1) * root(1,5,2)
+    s0 = p0 + expj(0.06)
+    s1 = s0 + expj(0.02)
+    s2 = cu(p1, s1)
+    s3 = s0 + expj(a)
+    p2 = cu(p1, s3)
+    p3 = cu(p2, s1)
+    s4 = cu(s3, s2)
+    p4 = cu(s4, p0)
+    return (symmetrise((p0, p1, p2, p3, p4, s0, s1, s2, s3, s4), "C5"), [abs(p3 - root(1,5,1)*p4) - 1])
