@@ -26,6 +26,16 @@ def jacobian(f, x0):
             J[i,j] = diff(fi, x0, dvec)
     return J
 
+def hessian(f, x0):
+    """Construct the Hessian matrix of the R^n -> R function f at x0."""
+    n = len(x0)
+    H = zeros(n,n)
+    for i in range(n):
+        for j in range(n):
+            dvec = tuple(int(k == i) + int(k == j) for k in range(n))
+            H[i,j] = diff(f, x0, dvec)
+    return H
+
 def findroot_svd(f, x0, maxsteps=20, normlimit=1e-12):
     """Find a root of f using Newton's method starting from x0,
     using the SVD to solve the linear system for robustness.

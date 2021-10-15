@@ -73,6 +73,33 @@ def rigid_14gon():
     vertices = core + r3 + r2 + r1
     return all_unit_distances(vertices)
 
+def rigid_hendecagon():
+    """Return a unit-distance braced regular hendecagon (11-gon) with 41 vertices
+    and 79 edges, a large improvement over Khodulyov's 155-edge bracing.
+    This is based on the cyclotomic field decomposition
+    (sqrt(-11)-1) / 2 = z + z^3 + z^4 + z^5 + z^9 with z the first primitive
+    11th root of unity.
+    The proof can be found in brace11gonproof.py and roughly follows my
+    braced heptagon proof, except that the Jacobian is deficient by two ranks
+    and the nullspace function's coordinates all have saddle points – the directions
+    in which those saddles stay at zero are different, however, which establishes
+    second-order rigidity."""
+    z0 = star_radius(11)
+    outer = [z0*u for u in unitroots(11)]
+    z1i = outer[1] + outer[-1] - outer[0]
+    z2i = outer[2] + outer[-1] - outer[0]
+    z1 = z1i * root(1, 11, 7)
+    z2 = z2i * root(1, 11, 7)
+    z3 = outer[3] + outer[-1] - outer[0]
+    z13 = cu(z1, z3)
+    z31 = cu(z3, z1)
+    z23 = cu(z2, z3)
+    z32 = cu(z3, z2)
+    spindle = [z1, z2, z3, z13, z31, z23, z32]
+    spindles = [v*root(1, 11, -4*k) for k in range(4) for v in spindle]
+    vertices = outer + [z1i, z2i] + spindles
+    return all_unit_distances(vertices)
+
 def cloud9_vertices(t, u):
     p0 = 0
     p1 = 1
