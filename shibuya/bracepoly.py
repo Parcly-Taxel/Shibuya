@@ -4,7 +4,7 @@ All graphs are Laman unless otherwise stated; if such a graph has v vertices
 it has 2v-3 edges.
 """
 from mpmath import *
-from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances, delete_vertices
+from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances, remove_edges, delete_vertices
 from shibuya.rigidity import jacobian
 
 def khodulyov_square():
@@ -38,6 +38,12 @@ def khodulyov_pentagon():
     vertices = (A, B, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14)
     return all_unit_distances(vertices)
 
+def rigid_hexagon():
+    """Return the trivial braced regular hexagon."""
+    vertices = unitroots(6) + [0]
+    return (vertices, ((0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 0),
+                       (6, 1), (6, 2), (6, 3), (6, 4), (6, 5)))
+
 def rigid_heptagon(suppress=None):
     """Return a unit-distance graph containing a regular heptagon that was conjectured by
     Ed Pegg to be rigid in https://math.stackexchange.com/q/3954719/357390.
@@ -62,15 +68,55 @@ def rigid_heptagon(suppress=None):
         return delete_vertices(G, (14, 17))
     return G
 
-def rigid_14gon():
-    """Return Somsky's braced 14-gon (47 vertices), based on the rigid heptagon."""
-    core = rigid_heptagon((2, 3))[0]
-    core = [v - core[0] for v in core]
-    z3, z2, z1 = core[6:3:-1]
-    r3 = [z3*root(1, 14, n+1) for n in range(7)]
-    r2 = [z2*root(1, 14, n+1) for n in range(9)]
-    r1 = [z1*root(1, 14, n+1) for n in range(12)]
-    vertices = core + r3 + r2 + r1
+def khodulyov_octagon():
+    """Return Andrei Khodulyov's 17-vertex rigid regular octagon."""
+    core = khodulyov_square()[0]
+    z0 = core[0] + 1j
+    core.extend([z0, cu(core[4], z0), cu(z0, core[4])])
+    core.append(cu(core[1], z0))
+    core.append(cu(core[4], core[-1]))
+    core.append(cu(core[5], core[-1]))
+    return all_unit_distances(core)
+
+def pl_cell(a, b, c, d):
+    """If in the chain abcd the angles abc and bcd are equal, return the extra
+    vertices of a Peaucellier–Lipkin linkage enforcing that equality."""
+    z0 = b+d-c
+    z1 = a+d-c
+    y0 = cu(z1, c, 1, sqrt(3))
+    y1 = cu(c, z1, sqrt(3), 1)
+    m = y0+y1-z1
+    a0 = cu(y0, c)
+    a1 = cu(c, y0)
+    a2 = cu(y1, c)
+    a3 = cu(c, y1)
+    return [z0, z1, y0, y1, m, a0, a1, a2, a3]
+
+def khodulyov_nonagon():
+    """Return Andrei Khodulyov's 27-vertex rigid regular nonagon."""
+    z0 = star_radius(9)
+    outer = [z0*u for u in unitroots(9)]
+    cell1 = pl_cell(outer[7], outer[8], outer[0], outer[1])
+    cell2 = pl_cell(outer[2], outer[1], outer[0], outer[8])
+    z1 = cu(outer[3], outer[5])
+    vertices = outer + cell1 + cell2[1:] + [z1]
+    return all_unit_distances(vertices)
+
+@remove_edges(lambda e: e == (0, 18))
+def khodulyov_decagon():
+    """Return Andrei Khodulyov's 29-vertex rigid regular decagon."""
+    core = khodulyov_pentagon()[0]
+    origin = core[10]
+    l0, h0 = core[-1], cu(core[7], core[1])
+    l1, h1 = cu(origin, h0), cu(l0, h0)
+    l2, h2 = cu(origin, h1), cu(l1, h1)
+    l3, h3 = cu(origin, h2), cu(l2, h2)
+    h4 = cu(l3, h3)
+    l4 = cu(origin, h4)
+    f0 = cu(core[9], l4)
+    f1 = cu(f0, h4)
+    f2 = cu(core[3], f0)
+    vertices = core + (h0, l1, h1, l2, h2, l3, h3, l4, h4, f0, f1, f2)
     return all_unit_distances(vertices)
 
 def rigid_hendecagon():
@@ -98,6 +144,52 @@ def rigid_hendecagon():
     spindle = [z1, z2, z3, z13, z31, z23, z32]
     spindles = [v*root(1, 11, -4*k) for k in range(4) for v in spindle]
     vertices = outer + [z1i, z2i] + spindles
+    return all_unit_distances(vertices)
+
+@remove_edges(lambda e: e == (14, 15) or e == (15, 25))
+def khodulyov_dodecagon():
+    """Return Andrei Khodulyov's 26-vertex rigid regular dodecagon."""
+    core = khodulyov_square()[0]
+    p0 = cu(core[1], core[0])
+    p1 = cu(core[1], p0)
+    p2 = cu(p0, core[0])
+    p3 = cu(p1, p0)
+    p4 = cu(p0, p2)
+    p5 = cu(core[2], core[1])
+    p6 = cu(core[0], core[3])
+    p7 = cu(p5, p1)
+    p8 = cu(p2, p6)
+    p9 = cu(p7, p1)
+    p10 = cu(p2, p8)
+    p11 = cu(p9, p3)
+    p12 = cu(p4, p10)
+    p13 = cu(p11, p3)
+    p14 = cu(p13, p12)
+    vertices = core + [p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14]
+    return all_unit_distances(vertices)
+
+def rigid_tetradecagon():
+    """Return Somsky's braced 14-gon (47 vertices), based on the rigid heptagon."""
+    core = rigid_heptagon((2, 3))[0]
+    core = [v - core[0] for v in core]
+    z3, z2, z1 = core[6:3:-1]
+    r3 = [z3*root(1, 14, n+1) for n in range(7)]
+    r2 = [z2*root(1, 14, n+1) for n in range(9)]
+    r1 = [z1*root(1, 14, n+1) for n in range(12)]
+    vertices = core + r3 + r2 + r1
+    return all_unit_distances(vertices)
+
+def khodulyov_polygon(n):
+    """For n >= 7 construct the rigid regular n-gon through Khodulyov's
+    equal-angle construction, which uses 19(n-3) + 4 - (n mod 2) edges."""
+    z0 = star_radius(n)
+    outer = [z0*u for u in unitroots(n)]
+    vertices = outer[:]
+    for k in range(2-(n//2), n//2, 2):
+        cell = pl_cell(outer[k-2], outer[k-1], outer[k], outer[k+1])
+        if 2*k+4 < n:
+            cell += pl_cell(outer[k+2], outer[k+1], outer[k], outer[k-1])[1:]
+        vertices.extend(cell)
     return all_unit_distances(vertices)
 
 def cloud9_vertices(t, u):
