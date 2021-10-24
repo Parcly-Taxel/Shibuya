@@ -44,7 +44,7 @@ def rigid_hexagon():
     return (vertices, ((0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 0),
                        (6, 1), (6, 2), (6, 3), (6, 4), (6, 5)))
 
-def rigid_heptagon(suppress=None):
+def rigid_heptagon(suppress=(2,3)):
     """Return a unit-distance graph containing a regular heptagon that was conjectured by
     Ed Pegg to be rigid in https://math.stackexchange.com/q/3954719/357390.
     I proved it to be rigid, even when two adjacent vertices are deleted;
@@ -168,8 +168,42 @@ def khodulyov_dodecagon():
     vertices = core + [p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14]
     return all_unit_distances(vertices)
 
+@remove_edges(lambda e: e == (20, 34))
+def rigid_tridecagon():
+    """Return a unit-distance braced regular tridecagon (13-gon) with 77 vertices
+    and 151 edges. This can be proved rigid in an analogous manner to the 11-gon case –
+    the nullspace here is 6-dimensional, but one coordinate of the nullspace function
+    has a positive-definite Hessian matrix, from which the result follows."""
+    p = [star_radius(13)*u for u in unitroots(13)]
+    def bridge(i, d):
+        q0 = p[i] + p[(i+2*d)%13] - p[(i+d)%13]
+        q1 = p[i] + p[(i-2*d)%13] - p[(i-d)%13]
+        q2 = q0 + q1 - p[i]
+        q3 = p[(i-3*d)%13] + q1 - p[(i-2*d)%13]
+        q4 = q2 + q3 - q1
+        q5 = p[(i+3*d)%13] + p[(i+5*d)%13] - p[(i+4*d)%13]
+        q6 = q5 + p[(i+6*d)%13] - p[(i+5*d)%13]
+        rl0 = cu(*[q3, q4][::d])
+        rr0 = cu(*[q4, q3][::d])
+        rl1 = (q6 + rl0) / 2
+        rr1 = (q6 + rr0) / 2
+        rl2 = cu(*[q6, rl1][::d])
+        rl3 = cu(*[rl1, rl0][::d])
+        rr2 = cu(*[rr0, rr1][::d])
+        rr3 = cu(*[rr1, q6][::d])
+        return [[q0, q1, q2, q3, q4, q5, q6], [rl0, rl1, rl2, rl3, rr0, rr1, rr2, rr3]]
+    bridges = [bridge(i, d) for (i, d) in ((5, 1), (5, -1), (0, 1), (0, -1), (-5, 1))]
+    qs, rs = zip(*bridges)
+    unique_qs = [qs[0][0]]
+    for qbridge in qs:
+        for q in qbridge:
+            if min(abs(q-uq) for uq in unique_qs) > 1e-12:
+                unique_qs.append(q)
+    vertices = p + unique_qs + [r for rset in rs for r in rset]
+    return all_unit_distances(vertices)
+
 def rigid_tetradecagon():
-    """Return Somsky's braced 14-gon (47 vertices), based on the rigid heptagon."""
+    """Return Somsky's braced 14-gon (47 vertices, 91 edges), based on the rigid heptagon."""
     core = rigid_heptagon((2, 3))[0]
     core = [v - core[0] for v in core]
     z3, z2, z1 = core[6:3:-1]
@@ -177,6 +211,29 @@ def rigid_tetradecagon():
     r2 = [z2*root(1, 14, n+1) for n in range(9)]
     r1 = [z1*root(1, 14, n+1) for n in range(12)]
     vertices = core + r3 + r2 + r1
+    return all_unit_distances(vertices)
+
+@remove_edges(lambda e: e in ((16, 37), (17, 39), (18, 38), (19, 40)))
+def rigid_hexadecagon():
+    """Return a braced regular 16-gon with 60 vertices and 117 edges."""
+    s = star_radius(16)
+    tiers = [[s], [s-root(1, 32, k) for k in range(7, -8, -2)]]
+    for _ in range(7):
+        prev = tiers[-1]
+        tiers.append([cu(prev[i], prev[i+1]) for i in range(len(prev)-1)])
+    rhombs = [v for tier in tiers for v in tier]
+    rays = tiers[1]
+    y1 = cu(rays[0], rays[2])
+    y2 = cu(rays[2], rays[4])
+    z1 = cu(rays[1], rays[3])
+    z2 = cu(rays[3], rays[5])
+    braces = [y1, y2, z1, z2]
+    for (v1, v2) in ((y1, rays[4]), (y2, rays[0]), (y2, rays[6]),
+                     (z1, rays[5]), (z2, rays[1]), (z2, rays[7])):
+        braces.append(cu(v1, v2))
+        braces.append(cu(v2, v1))
+    braces.extend(pl_cell(tiers[3][-1], tiers[2][-1], tiers[1][-1], tiers[0][-1])[2:])
+    vertices = rhombs + braces
     return all_unit_distances(vertices)
 
 def khodulyov_polygon(n):
