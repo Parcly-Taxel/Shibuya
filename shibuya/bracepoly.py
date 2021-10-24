@@ -213,28 +213,23 @@ def rigid_tetradecagon():
     vertices = core + r3 + r2 + r1
     return all_unit_distances(vertices)
 
-@remove_edges(lambda e: e in ((16, 37), (17, 39), (18, 38), (19, 40)))
 def rigid_hexadecagon():
-    """Return a braced regular 16-gon with 60 vertices and 117 edges."""
-    s = star_radius(16)
-    tiers = [[s], [s-root(1, 32, k) for k in range(7, -8, -2)]]
-    for _ in range(7):
-        prev = tiers[-1]
-        tiers.append([cu(prev[i], prev[i+1]) for i in range(len(prev)-1)])
-    rhombs = [v for tier in tiers for v in tier]
-    rays = tiers[1]
-    y1 = cu(rays[0], rays[2])
-    y2 = cu(rays[2], rays[4])
-    z1 = cu(rays[1], rays[3])
-    z2 = cu(rays[3], rays[5])
-    braces = [y1, y2, z1, z2]
-    for (v1, v2) in ((y1, rays[4]), (y2, rays[0]), (y2, rays[6]),
-                     (z1, rays[5]), (z2, rays[1]), (z2, rays[7])):
-        braces.append(cu(v1, v2))
-        braces.append(cu(v2, v1))
-    braces.extend(pl_cell(tiers[3][-1], tiers[2][-1], tiers[1][-1], tiers[0][-1])[2:])
-    vertices = rhombs + braces
-    return all_unit_distances(vertices)
+    """Return a braced regular 16-gon with 56 vertices and 109 edges."""
+    rhombs = [0, 1, root(1,16,7), 1+root(1,16,1), root(1,16,7)+root(1,16,6),
+              1+root(1,16,1)+root(1,16,2), root(1,16,7)+root(1,16,6)+root(1,16,5),
+              1+root(1,16,1)+root(1,16,2)+root(1,16,3),
+              root(1,16,7)+root(1,16,6)+root(1,16,5)+root(1,16,4)]
+    for (i, j, k) in ((0,3,1), (0,4,2), (5,9,3), (6,10,4), (9,10,0), (12,13,10), (11,13,9),
+                      (6,14,12), (5,15,11), (8,16,6), (7,17,5), (14,18,16), (15,19,17),
+                      (13,20,14), (13,21,15), (22,23,13), (21,24,23), (20,24,22), (25,26,24),
+                      (18,26,20), (19,25,21), (8,28,18), (7,29,19), (27,28,26), (27,29,25),
+                      (30,32,28), (31,33,29), (32,33,27)):
+        rhombs.append(rhombs[i] + rhombs[j] - rhombs[k])
+    for (i, j) in ((3,15), (4,14), (9,17), (10,16), (18,24), (19,24)):
+        rhombs.append(cu(rhombs[i], rhombs[j]))
+        rhombs.append(cu(rhombs[j], rhombs[i]))
+    rhombs.extend(pl_cell(*(rhombs[i] for i in (6, 4, 2, 0)))[2:])
+    return all_unit_distances(rhombs)
 
 def khodulyov_polygon(n):
     """For n >= 7 construct the rigid regular n-gon through Khodulyov's
