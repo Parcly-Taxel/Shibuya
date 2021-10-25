@@ -230,11 +230,18 @@ def f54a_vertices(t):
     vertices = r0 + r1 + r2
     return (vertices, abs(z2b - r1[1]) - 1)
 
-def f54a():
-    """Return a unit-distance embedding of the F54A graph."""
-    t0 = findroot(lambda t: f54a_vertices(t)[1], 1.755)
-    edges = ring_edges(18, ((0, 0, 9), (1, 0, 1), (1, 0, -1), (1, 2, 0), (2, 2, 1)))
-    return (f54a_vertices(t0)[0], edges)
+def f54a(i=0):
+    """Return one of three (depending on i) algebraically related
+    unit-distance embeddings of the F54A graph."""
+    pa = [[3], [-2, -8, -11], [15, 40, 21], [-48, -80, -31], [72, 96, 19], [-35, -94, -5], [17, 5, 14]]
+    pb = [[3], [0, 0, -9], [-5, 8, 7], [10, -16, 1], [6, -6, -15], [-11, 14, 13], [19, -41, 10]]
+    pc = [[3], [2, 8, -7], [5, 0, 11], [8, 0, -3], [-2, 16, -13], [-15, 22, 13], [19, -41, 10]]
+    a = polyroots([polyval(l, 2*cos(pi/9)) for l in pa], extraprec=100)[(5, 0, 1)[i]]
+    b = polyroots([polyval(l, 2*cos(pi/9)) for l in pb])[(2, 1, 5)[i]]
+    c = polyroots([polyval(l, 2*cos(pi/9)) for l in pc])[(1, 3, 2)[i]]
+    triple = [a, b, c]
+    line = [p-d for p in triple for d in (0, 1)]
+    return all_unit_distances(symmetrise(line, "C9"))
 
 def f56a():
     """Return a unit-distance embedding of the F56A graph.
