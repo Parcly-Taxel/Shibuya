@@ -213,6 +213,32 @@ def rigid_tetradecagon():
     vertices = core + r3 + r2 + r1
     return all_unit_distances(vertices)
 
+@remove_edges(lambda e: e == (0, 18))
+def rigid_pentadecagon():
+    """Return a braced regular 15-gon with 47 vertices and 91 edges,
+    built around the core of Khodulyov's decagon bracing."""
+    core = khodulyov_decagon()[0][:-2]
+    origin = core[10]
+    extras = [[core[3], core[9]], [core[17], core[7]], [core[21], core[18]], [core[25], core[22]], [core[26], core[24]]]
+    for i in range(5):
+        extras[i].append(cu(*extras[i]))
+    for i in range(5):
+        extras[i].append(cu(extras[i][2], extras[i-1][0]))
+    for i in range(5):
+        extras[i].append(cu(extras[i][3], extras[i-1][2]))
+    for i in range(5):
+        extras[i].append(cu(extras[i][4], extras[i-1][3]))
+    extrasflat = [v for chain in extras for v in chain]
+    extrasmap = [3, 9, 27, 28, 29, 30,
+                 17, 7, 31, 32, 33, 34,
+                 21, 18, 35, 36, 37, 38,
+                 25, 22, 39, 40, 41, 42,
+                 26, 24, 43, 44, 45, 46]
+    extraedges = list(filter(lambda e: e[0]%6 > 1 or e[1]%6 > 1, all_unit_distances(extrasflat)[1]))
+    extraedges = [(extrasmap[e[0]], extrasmap[e[1]]) for e in extraedges]
+    vertices = list(core) + [v for chain in extras for v in chain[2:]]
+    return (vertices, all_unit_distances(core)[1] + extraedges)
+
 def rigid_hexadecagon():
     """Return a braced regular 16-gon with 56 vertices and 109 edges."""
     rhombs = [0, 1, root(1,16,7), 1+root(1,16,1), root(1,16,7)+root(1,16,6),
