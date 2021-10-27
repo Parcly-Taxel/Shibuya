@@ -231,6 +231,18 @@ def rigid_hexadecagon():
     rhombs.extend(pl_cell(*(rhombs[i] for i in (6, 4, 2, 0)))[2:])
     return all_unit_distances(rhombs)
 
+@remove_edges(lambda e: 21 <= e[0] < e[1] <= 24 or 36 <= e[0] < e[1] <= 44)
+def rigid_octadecagon():
+    """Return a braced regular 18-gon with 60 vertices and 117 edges."""
+    rhombs = [[0], [root(1, 18, 4), root(1, 18, -4)]]
+    for k in range(3, -4, -1):
+        middle = [rhombs[-1][i] + rhombs[-1][i+1] - rhombs[-2][i] for i in range(len(rhombs[-2]))]
+        rhombs.append([rhombs[-1][0] + root(1, 18, k)] + middle + [rhombs[-1][-1] + root(1, 18, -k)])
+    rhombs = [v for layer in rhombs+[[2*star_radius(18)]] for v in layer]
+    rhombs.extend(pl_cell(rhombs[3], rhombs[1], rhombs[0], rhombs[2])[2:])
+    rhombs.extend(pl_cell(rhombs[5], rhombs[2], rhombs[0], rhombs[1])[2:])
+    return all_unit_distances(rhombs)
+
 def khodulyov_polygon(n):
     """For n >= 7 construct the rigid regular n-gon through Khodulyov's
     equal-angle construction, which uses 19(n-3) + 4 - (n mod 2) edges."""
