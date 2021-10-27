@@ -218,7 +218,6 @@ def rigid_pentadecagon():
     """Return a braced regular 15-gon with 47 vertices and 91 edges,
     built around the core of Khodulyov's decagon bracing."""
     core = khodulyov_decagon()[0][:-2]
-    origin = core[10]
     extras = [[core[3], core[9]], [core[17], core[7]], [core[21], core[18]], [core[25], core[22]], [core[26], core[24]]]
     for i in range(5):
         extras[i].append(cu(*extras[i]))
@@ -234,8 +233,7 @@ def rigid_pentadecagon():
                  21, 18, 35, 36, 37, 38,
                  25, 22, 39, 40, 41, 42,
                  26, 24, 43, 44, 45, 46]
-    extraedges = list(filter(lambda e: e[0]%6 > 1 or e[1]%6 > 1, all_unit_distances(extrasflat)[1]))
-    extraedges = [(extrasmap[e[0]], extrasmap[e[1]]) for e in extraedges]
+    extraedges = [(extrasmap[e[0]], extrasmap[e[1]]) for e in all_unit_distances(extrasflat)[1] if e[0]%6 > 1 or e[1]%6 > 1]
     vertices = list(core) + [v for chain in extras for v in chain[2:]]
     return (vertices, all_unit_distances(core)[1] + extraedges)
 
