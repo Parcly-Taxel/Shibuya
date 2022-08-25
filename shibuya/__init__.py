@@ -1,2 +1,2 @@
 # Things to do on `import shibuya`...
-from .draw import draw
+from .draw import drawing, draw_graph
