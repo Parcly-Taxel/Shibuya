@@ -65,3 +65,13 @@ def draw_graph(graph, outfn, scale=400, pad=0.04):
     for v in vertices:
         res.add_circle(v.real, v.imag)
     res.write(outfn)
+
+def draw_pointpacking(data, outfn, scale=400):
+    """Draw the given packing of points in a unit square, writing to outfn.svg."""
+    d, points = data
+    res = drawing(scale)
+    for p in points:
+        res.add_circle(p.real, p.imag, d/2, {"fill": "#6dc6fb", "fill-opacity": "0.8",
+                                             "stroke": "#1c92cd", "stroke-width": 0.005*d})
+        res.add_circle(p.real, p.imag, 0.02*d)
+    res.write(outfn)

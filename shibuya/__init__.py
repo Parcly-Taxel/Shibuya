@@ -1,2 +1,2 @@
 # Things to do on `import shibuya`...
-from .draw import drawing, draw_graph
+from .draw import drawing, draw_graph, draw_pointpacking
