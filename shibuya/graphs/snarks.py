@@ -3,8 +3,8 @@ Unit-distance embeddings of snarks (3-connected cubic graphs with chromatic inde
 including the Tietze graph.
 """
 from mpmath import *
-from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances
-from shibuya.generators import fixparams_unitdist, symmetrise
+from shibuya.generators import (cu, star_radius, ring_edges,
+        all_unit_distances, fixparams_unitdist, symmetrise)
 
 def tietze():
     """Return a unit-distance embedding of Tietze's graph."""

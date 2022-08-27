@@ -2,8 +2,8 @@
 Other unit-distance graphs...
 """
 from mpmath import *
-from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances
-from shibuya.generators import fixparams_unitdist, symmetrise
+from shibuya.generators import (cu, star_radius, ring_edges,
+        all_unit_distances, fixparams_unitdist, symmetrise)
 
 def franklin():
     """Return a unit-distance embedding of the Franklin graph."""

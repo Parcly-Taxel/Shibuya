@@ -5,7 +5,7 @@ rigid graph, {UnitDistance, {12, 2}}.
 """
 from mpmath import *
 from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances
-from shibuya.rigidity import jacobian
+from shibuya.graphs.rigidity import jacobian
 
 def ud93_vertices(t):
     A = 0

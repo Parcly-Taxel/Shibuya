@@ -4,7 +4,8 @@ and include a convenience function for generalised Petersen graphs.
 """
 from math import gcd
 from mpmath import sqrt, root, unitroots, almosteq
-from shibuya.generators import disjoint_union, cartesian_product2, cu, star_radius, ring_edges
+from shibuya.generators import (disjoint_union, cartesian_product2,
+        cu, star_radius, ring_edges)
 
 def igraph(n, j, k):
     """Return a unit-distance embedding of the I-graph (n,j,k), either directly

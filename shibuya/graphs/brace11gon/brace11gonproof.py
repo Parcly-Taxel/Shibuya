@@ -2,7 +2,7 @@
 from mpmath import *
 mp.dps = 100
 from shibuya.generators import cu, star_radius
-from shibuya.rigidity import jacobian, hessian
+from shibuya.graphs.rigidity import jacobian, hessian
 
 def f(*angles):
     a4, a3, a2, a1, a7, a8, a9, a10 = angles

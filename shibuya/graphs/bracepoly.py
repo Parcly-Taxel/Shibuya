@@ -5,7 +5,7 @@ it has 2v-3 edges.
 """
 from mpmath import *
 from shibuya.generators import cu, star_radius, ring_edges, all_unit_distances, remove_edges, delete_vertices
-from shibuya.rigidity import jacobian
+from shibuya.graphs.rigidity import jacobian
 
 def khodulyov_square():
     """Return Andrei Khodulyov's 11-vertex rigid square."""

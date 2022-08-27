@@ -3,8 +3,8 @@ Skeletons of polyhedra. If the graph is cubic then it likely has a unit-distance
 if there are multiple higher-degree vertices it likely doesn't.
 """
 from mpmath import *
-from shibuya.generators import cu, ring_edges, star_radius
-from shibuya.generators import fixparams_unitdist, symmetrise, remove_edges
+from shibuya.generators import (cu, ring_edges, star_radius,
+        fixparams_unitdist, symmetrise, remove_edges)
 
 def tetrahedron():
     """Return the integral embedding of the tetrahedral graph with shortest

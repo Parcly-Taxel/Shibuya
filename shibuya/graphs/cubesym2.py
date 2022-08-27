@@ -4,8 +4,8 @@ same order follows Conder's list (https://www.math.auckland.ac.nz/~conder/symmcu
 which sorts by arc-transitivity, not Foster's list.
 """
 from mpmath import *
-from shibuya.generators import cu, star_radius
-from shibuya.generators import fixparams_unitdist, symmetrise, remove_edges
+from shibuya.generators import (cu, star_radius, fixparams_unitdist,
+        symmetrise, remove_edges)
 
 @fixparams_unitdist(0.37, 1.47)
 def f104a(a, b):

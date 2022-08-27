@@ -3,9 +3,8 @@ Cubic symmetric graphs. Most of the embeddings realised here were taken from Mat
 """
 from mpmath import *
 from functools import reduce
-from shibuya.generators import cu, star_radius, ring_edges, lcf_edges
-from shibuya.generators import all_unit_distances, circumcentre
-from shibuya.generators import fixparams_unitdist, symmetrise
+from shibuya.generators import (cu, star_radius, ring_edges, lcf_edges,
+        all_unit_distances, circumcentre, fixparams_unitdist, symmetrise)
 
 # F4A = tetrahedron() or complete(4) (not unit-distance)
 # F6A = circulant(6, (1, 3)) or mobiusladder(3) (not unit-distance)
