@@ -33,26 +33,45 @@ def p8():
 def p9():
     return (0.5, [mpc(x,y)/2 for x in (0,1,2) for y in (0,1,2)])
 
-"""coef10d = [1180129, -11436428, 98015844, -462103584, 1145811528, -1398966480, 227573920, 1526909568, -1038261808, -2960321792, 7803109440, -9722063488, 7918461504, -4564076288, 1899131648, -563649536, 114038784, -14172160, 819200]
-coef10x = [4833808384, -18292893696, 231089016320, -1126322897408, 2641176117632, -3604472915840, 3142380993216, -1893047603328, 926983988992, -469985292736, 225222946304, -56978206656, -15097884104, 17327716152, -5236535740, 336548136, 165929282, -38942194, 2584905]
-d10 = newton(coef10d, 0.421)
-x10 = newton(coef10x, 0.284)
-y10 = sqrt(d10 ** 2 - x10 ** 2)
-l10 = [[0, 0], [x10, y10], [2 * x10, 0], [2 * x10 + d10, 0], [0, 2 * y10]]
-y10_1 = sqrt(d10 ** 2 - (1 - 2 * x10 - d10) ** 2)
-l10 += [[1, y10_1], [1, y10_1 + d10]]
-x10_5 = 1 - sqrt(d10 ** 2 - (1 - y10_1 - d10) ** 2)
-l10 += [[x10_5, 1], [x10_5, 1 - d10], [sqrt(d10 ** 2 - (1 - 2 * y10) ** 2), 1]]
-dd[10] = d10
-pd[10] = l10
+"""
+from sympy import *
+params = symbols("a b y x d")
+ideal = (S("x^2+y^2-d^2"),
+         S("(2*x+d-1)^2+b^2-d^2"),
+         S("a^2+(1-2*y)^2-d^2"),
+         S("(a+d-1)^2+(b+d-1)^2-d^2"),
+         S("(x-a-d)^2+(y-1+d)^2-d^2"))
+GB = groebner(ideal, params, order="lex")
+print(GB)
+"""
+def p10():
+    dp = [1180129, -11436428, 98015844, -462103584, 1145811528,
+          -1398966480, 227573920, 1526909568, -1038261808, -2960321792,
+          7803109440, -9722063488, 7918461504, -4564076288, 1899131648,
+          -563649536, 114038784, -14172160, 819200]
+    xp = [4833808384, -18292893696, 231089016320, -1126322897408, 2641176117632,
+          -3604472915840, 3142380993216, -1893047603328, 926983988992, -469985292736,
+          225222946304, -56978206656, -15097884104, 17327716152, -5236535740,
+          336548136, 165929282, -38942194, 2584905]
+    d = polyroots(dp, extraprec=50)[0]
+    x = polyroots(xp, extraprec=50)[4]
+    y = sqrt(d*d - x*x)
+    a = sqrt(d*d - (1-2*y)**2)
+    b = sqrt((1-2*x) * (2*(d+x)-1))
+    return (d, [mpc(*z) for z in ((0,0), (x,y), (2*x,0), (0,2*y), (2*x+d,0),
+                                  (a,1), (a+d,1), (1,b), (1,b+d), (a+d,1-d))])
 
-d11 = (-sqrt(2 + 4*sqrt(2)) + 2 + sqrt(6) + 2*sqrt(2))/(sqrt(2) + sqrt(6) + 2*sqrt(3) + 4)
-dd[11] = d11
-pd[11] = [[0, 0], [0, d11], [d11, 0], [1, 1], [1 - sqrt(2) * d11, 1], [1, 1 - sqrt(2) * d11],
-          [1 - sqrt(2) / 2 * d11, 1 - sqrt(2) / 2 * d11], [0.91, 0.025], [0.025, 0.91],
-          [1 - sqrt(2) * d11 - (sqrt(6) - sqrt(2)) * d11 / 4, 1 - (sqrt(6) + sqrt(2)) * d11 / 4],
-          [1 - (sqrt(6) + sqrt(2)) * d11 / 4, 1 - sqrt(2) * d11 - (sqrt(6) - sqrt(2)) * d11 / 4]]
+def p11():
+    d = polyroots([1, 8, -22, 20, 18, -24, -24, 32, -8])[1]
+    x = polyroots([16, -32, 16, 8, -7])[1] * d
+    y = polyroots([16, -32, 16, -8, 1])[1] * d
+    return (d, [mpc(*z) for z in ((0,0), (0,d), (d,0), (1,1), (1-sqrt(2)*d,1), (1,1-sqrt(2)*d),
+                                  (1-d/sqrt(2),1-d/sqrt(2)), (x,y), (y,x), (0.91,0.025), (0.025,0.91))])
 
+def p12():
+    return (sqrt(34)/15, [mpc(fraction(x,3), fraction(y+x%2,5))
+                          for x in (0,1,2,3) for y in (0,2,4)])
+"""
 dd[12] = sqrt(34) / 15
 pd[12] = [[a / 3, b / 5] for a in range(4) for b in range(6) if (a + b + 1) % 2]
 
@@ -123,25 +142,4 @@ l19 += [[x14, y14], [x15, y15], [x18, 1], [x19, 1], [0, d19 + 2 * v25y], [1, d19
 pd[19] = l19
 
 dd[20] = (6 - sqrt(2)) / 16
-pd[20] = [[a / 4, b * dd[20] + (3 * sqrt(2) - 2) / 16 * (a % 2)] for a in range(5) for b in range(4)]
-
-def assemble(n):
-    d, points = dd[n], pd[n]
-    canvas_size = round((1 + d) * 1.1 * 1024, 8)
-    boundary = round((1 + d) * 1024, 8)
-    origin = round((-d / 2 - (1 + d) * 0.05) * 1024, 8)
-    sw = round((1 + d) * 2.5, 8)
-    radius = round(d * 512, 8)
-    def drawcircle(p):
-        x = round(p[0] * 1024, 8)
-        y = round((1 - p[1]) * 1024, 8)
-        return f'<circle cx="{x}" cy="{y}" r="{radius}" fill="#6dc6fb" fill-opacity="0.8" stroke="#000" stroke-width="{sw}"/>'
-    lines = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{origin} {origin} {canvas_size} {canvas_size}">',
-    f'<rect width="1024" height="1024" fill="none" stroke="#000" stroke-width="{sw}"/>',
-    f'<rect x="{-radius}" y="{-radius}" width="{boundary}" height="{boundary}" fill="none" stroke="#000" stroke-width="{sw}"/>']
-    for p in points: lines.append(drawcircle(p))
-    lines.append('</svg>')
-    return '\n'.join(lines)
-
-for n in dd:
-    with open(f"{n}.svg", 'w') as f: f.write(assemble(n))"""
+pd[20] = [[a / 4, b * dd[20] + (3 * sqrt(2) - 2) / 16 * (a % 2)] for a in range(5) for b in range(4)]"""
