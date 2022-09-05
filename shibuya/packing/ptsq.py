@@ -7,6 +7,22 @@ and http://hydra.nat.uni-magdeburg.de/packing/csq/csq.html
 """
 from mpmath import *
 
+def chickenwire(a, b):
+    """Return the chicken-wire point packing where the points are placed
+    at alternate vertices of an a-by-b-rectangle grid, stretched to fill
+    the unit square."""
+    return (sqrt(fraction(a*a+b*b, a*a*b*b)),
+            [mpc(fraction(x,a), fraction(y,b)) for x in range(a+1) for y in range(x%2,b+1,2)])
+
+def mappacking(a, b):
+    """Return the map-like point packing where an a-by-b point lattice is
+    folded like a map to fit in the unit square. Circles contact on the
+    b (vertical) axis."""
+    a_, b_ = a-1, b-1
+    d = (a_*b_ - sqrt(a_*a_ - b_*b_ + 1))/(a_*(b_*b_ - 1))
+    y = 1-b_*d
+    return (d, [mpc(fraction(i,a_), i%2*y+j*d) for i in range(a) for j in range(b)])
+
 def p2():
     return (sqrt(2), [0, 1+1j])
 
@@ -20,7 +36,7 @@ def p5():
     return (sqrt(0.5), [0, 1, 1j, 1+1j, 0.5+0.5j])
 
 def p6():
-    return (sqrt(13)/6, [mpc(x/2, y/mpf(3)) for x in (0,1,2) for y in (x%2,2+x%2)])
+    return chickenwire(2, 3)
 
 def p7():
     d = 4-2*sqrt(3)
@@ -69,8 +85,7 @@ def p11():
                                   (1-d/sqrt(2),1-d/sqrt(2)), (x,y), (y,x), (0.91,0.025), (0.025,0.91))])
 
 def p12():
-    return (sqrt(34)/15, [mpc(fraction(x,3), fraction(y+x%2,5))
-                          for x in (0,1,2,3) for y in (0,2,4)])
+    return chickenwire(3, 5)
 
 """
 option(prot); LIB "elim.lib";
@@ -105,9 +120,9 @@ def p13():
           [-6644850582641145, 11521181021601304], [2830038050144638, -4902736797205390], [-637851253724384, 1104827687429172]]
     with extraprec(50):
         s = sqrt(3)
-        d = polyroots([polyval(z, sqrt(3)) for z in dp], extraprec=50)[0]
-        x = polyroots([polyval(z, sqrt(3)) for z in xp], extraprec=50)[0]
-        a = polyroots([polyval(z, sqrt(3)) for z in ap], extraprec=50)[0]
+        d = polyroots([polyval(z, s) for z in dp], extraprec=50)[0]
+        x = polyroots([polyval(z, s) for z in xp], extraprec=50)[0]
+        a = polyroots([polyval(z, s) for z in ap], extraprec=50)[0]
         y = sqrt(d*d - x*x)
         b = sqrt(d*d - a*a)
         q = (1-(a+s*b)/2, 1-2*b+(b-s*a)/2)
@@ -153,7 +168,6 @@ poly pd=elim(I,abk)[1];
 pd;
 """
 def p17():
-    # d^8-4*d^7+6*d^6-14*d^5+22*d^4-20*d^3+36*d^2-26*d+5
     d = polyroots([1, -4, 6, -14, 22, -20, 36, -26, 5])[0]
     a = sqrt(d-0.25)
     b = d+0.5 - sqrt((d-a+0.5) * (d+a-0.5))
@@ -163,26 +177,38 @@ def p17():
     return (d, points)
 
 def p18():
-    pass
+    return chickenwire(4, 6)
+
 """
-dd[18] = sqrt(13) / 12
-pd[18] = [[a / 4, b / 6] for a in range(5) for b in range(7) if (a + b + 1) % 2]
+option(prot); LIB "elim.lib";
+ring r=(0,s),(a,y,x,d),dp; minpoly=s2-3;
+ideal I=x2+y2-d2,(x-a)^2+(d+3y-1)^2-d2,
+        (1-(s/2+1)*d-a)^2+(3d/2+2y-1)^2-d2,2x+s*d-1;
+I=sat(I,d*(2d+1-s))[1];
+poly pd=elim(I,ayx)[1];
+pd;
+"""
+def p19():
+    s = sqrt(3)
+    dp = [[0, 22], [25, -65], [-280, -422], [213, 467], [-78, -162], [52, -52]]
+    d = polyroots([polyval(z, s) for z in dp], extraprec=50)[1]
+    x = (1-s*d)/2
+    y = sqrt(d*d - x*x)
+    dx, dy = d*s/2, d/2
+    a = x + sqrt((1-3*y) * (2*d+3*y-1))
+    return (d, [0, 1] + [mpc(*z) for z in ((0,0), (dx,dy), (2*dx,0), (1-x,y), (1,0),
+                                           (0,d), (x,d+y), (0.5,y+dy), (1-dx,2*y+dy), (1,2*y),
+                                           (0,d+2*y), (x,d+3*y), (2*x,d+2*y), (1-dx,1.5*d+2*y), (1,d+2*y),
+                                           (a,1), (a+d,1), (0.03,0.96), (0.97,0.96))])
 
-coef19d = [242, -1430, -8109, 58704, -78452, -2918, 43315, 39812, -53516, 20592, -2704]
-d19 = newton(coef19d, 0.290)
-dd[19] = d19
-v24x, v24y = -sqrt(3) / 2 * d19, d19 / 2
-v25x = (1 - sqrt(3) * d19) / 2
-v25y = sqrt(d19 ** 2 - v25x ** 2)
-l19 = [[0, 0], [1, 0]] + [[sqrt(3) * d19 + a * v24x + b * v25x, a * v24y + b * v25y] for a in range(3) for b in range(3)]
-x15 = sqrt(3) * d19 + 2 * v24x + v25x
-y15 = 2 * v24y + 3 * v25y
-x14 = 2 * v25x - v24x
-y14 = d19 + 2 * v25y + v24y
-x18 = x15 + sqrt(d19 ** 2 - (1 - y15) ** 2)
-x19 = x14 - sqrt(d19 ** 2 - (1 - y14) ** 2)
-l19 += [[x14, y14], [x15, y15], [x18, 1], [x19, 1], [0, d19 + 2 * v25y], [1, d19 + 2 * v25y], [0.03, 0.96], [0.97, 0.96]]
-pd[19] = l19
+def p20():
+    return mappacking(5, 4)
 
-dd[20] = (6 - sqrt(2)) / 16
-pd[20] = [[a / 4, b * dd[20] + (3 * sqrt(2) - 2) / 16 * (a % 2)] for a in range(5) for b in range(4)]"""
+def p25():
+    return (0.25, [mpc(x,y)/4 for x in range(5) for y in range(5)])
+
+def p27():
+    return chickenwire(5, 8)
+
+def p30():
+    return mappacking(6, 5)
