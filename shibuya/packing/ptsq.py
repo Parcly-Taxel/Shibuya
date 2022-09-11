@@ -212,3 +212,8 @@ def p27():
 
 def p30():
     return mappacking(6, 5)
+
+def pn(n):
+    """Return the best known point packing in a unit square
+    with the given number of points."""
+    return eval(f"p{n}()")

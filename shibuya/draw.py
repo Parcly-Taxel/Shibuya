@@ -25,6 +25,12 @@ class drawing:
         attrib = {"cx": str(x*scale), "cy": str(-y*scale), "r": str(r*scale)}
         self.add_object("circle", attrib, styledict)
 
+    def add_rect(self, x, y, w, h, styledict=None):
+        scale = self.scale
+        attrib = {"x": str(x*scale), "y": str(-(y+h)*scale), "width": str(w*scale),
+                "height": str(h*scale)}
+        self.add_object("rect", attrib, styledict)
+
     def add_path(self, cmds, styledict=None):
         """Accepts a sequence of sequences of a letter followed by numbers
         representing SVG path commands."""
@@ -66,12 +72,22 @@ def draw_graph(graph, outfn, scale=400, pad=0.04):
         res.add_circle(v.real, v.imag)
     res.write(outfn)
 
-def draw_pointpacking(data, outfn, scale=400):
-    """Draw the given packing of points in a unit square, writing to outfn.svg."""
+def draw_pointpacking(data, frame, outfn, scale=400):
+    """Draw the given packing of points in a unit square or circle,
+    writing to outfn.svg."""
     d, points = data
-    res = drawing(scale)
+    if frame.startswith("sq"):
+        res = drawing(scale, (1+d, 1+d), (-d/2, -d/2))
+        res.add_rect(0, 0, 1, 1, {"fill": "none", "stroke": "#000", "stroke-width": 0.005*d})
+    elif frame.startswith("ci"):
+        res = drawing(scale, (2+d, 2+d), (-(1+d/2), -(1+d/2)))
+        res.add_circle(0, 0, 1, {"fill": "none", "stroke": "#000", "stroke-width": 0.005*d})
     for p in points:
         res.add_circle(p.real, p.imag, d/2, {"fill": "#6dc6fb", "fill-opacity": "0.8",
                                              "stroke": "#1c92cd", "stroke-width": 0.005*d})
         res.add_circle(p.real, p.imag, 0.02*d)
+    if frame.startswith("sq"):
+        res.add_rect(-d/2, -d/2, 1+d, 1+d, {"fill": "none", "stroke": "#000", "stroke-width": 0.005*d})
+    elif frame.startswith("ci"):
+        res.add_circle(0, 0, 1+d/2, {"fill": "none", "stroke": "#000", "stroke-width": 0.005*d})
     res.write(outfn)
