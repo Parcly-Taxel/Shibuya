@@ -6,6 +6,7 @@ Cf. https://erich-friedman.github.io/packing/cirinsqu
 and http://hydra.nat.uni-magdeburg.de/packing/csq/csq.html
 """
 from mpmath import *
+from shibuya.draw import drawing
 
 def chickenwire(a, b):
     """Return the chicken-wire point packing where the points are placed
@@ -217,3 +218,14 @@ def pn(n):
     """Return the best known point packing in a unit square
     with the given number of points."""
     return eval(f"p{n}()")
+
+def draw_packing(data, outfn, scale=400):
+    d, points = data
+    res = drawing(scale, (1+d, 1+d), (-d/2, -d/2))
+    res.add_rect(0, 0, 1, 1, {"fill": "none", "stroke": "#000", "stroke-width": 0.005*d})
+    for p in points:
+        res.add_circle(p.real, p.imag, d/2, {"fill": "#6dc6fb", "fill-opacity": "0.8",
+                                             "stroke": "#1c92cd", "stroke-width": 0.005*d})
+        res.add_circle(p.real, p.imag, 0.02*d)
+    res.add_rect(-d/2, -d/2, 1+d, 1+d, {"fill": "none", "stroke": "#000", "stroke-width": 0.005*d})
+    res.write(outfn)

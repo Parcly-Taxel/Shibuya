@@ -6,6 +6,7 @@ Cf. https://erich-friedman.github.io/packing/cirincir
 and http://hydra.nat.uni-magdeburg.de/packing/cci/cci.html
 """
 from mpmath import *
+from shibuya.draw import drawing
 
 def thas(t):
     """Given t = tan(x/2), return the point on the unit circle
@@ -41,11 +42,7 @@ def p10():
     d = 2*u / hypot(1,u)
     a = sqrt(polyroots([polyval(z, s) for z in ap], extraprec=50)[1])
     zu = thas(u)
-    zt = a + mpc(s,1)*d/2
-    points = [zt*zu**k for k in range(4)]
-    points += [conj(z) for z in points]
-    points += [a, a-d]
-    return (d, points)
+    return (d, [zu**(k/2) for k in range(-7,8,2)] + [a, a-d])
 
 def p11():
     d = 2*sinpi(fraction(1,9))
@@ -107,3 +104,14 @@ def pn(n):
     if n < 10:
         return psmall(n)
     return eval(f"p{n}()")
+
+def draw_packing(data, outfn, scale=400):
+    d, points = data
+    res = drawing(scale, (2+d, 2+d), (-(1+d/2), -(1+d/2)))
+    res.add_circle(0, 0, 1, {"fill": "none", "stroke": "#000", "stroke-width": 0.005*d})
+    for p in points:
+        res.add_circle(p.real, p.imag, d/2, {"fill": "#6dc6fb", "fill-opacity": "0.8",
+                                             "stroke": "#1c92cd", "stroke-width": 0.005*d})
+        res.add_circle(p.real, p.imag, 0.02*d)
+    res.add_circle(0, 0, 1+d/2, {"fill": "none", "stroke": "#000", "stroke-width": 0.005*d})
+    res.write(outfn)
