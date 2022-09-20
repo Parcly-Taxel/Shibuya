@@ -87,11 +87,10 @@ def c11():
     return (r, [a, b, c] + ps + [conj(p) for p in ps])
 
 def c12():
-    ur = unitroots(3)
+    o = unitroots(3)
     r = polyroots([1, -1, 3, -1])[0]
-    a = polyroots([1, 3, 1, -3])[0]
-    z = 1 + r*ur[1]
-    return (r, [p*u for p in (1-2*r, -a, z, conj(z)) for u in ur])
+    z = 1 + r*o[1]
+    return (r, [p*u for p in (1-2*r, 2-1/r, z, conj(z)) for u in o])
 
 def cn(n):
     """Return the best known circle covering of a unit circle

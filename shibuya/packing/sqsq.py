@@ -38,6 +38,22 @@ def p11():
     return (s, ((0,1), (1,2), (1j,1+1j), (c,c+1), (mpc(1,s),s*1j), (mpc(s,s),mpc(s-1,s)),
                 (k1,k1-v), (k2,k2+1j*v), (k3,k3+1j*v), (k4,k4-1j*v), (k5,k5+v)))
 
+def p18():
+    s = (7+sqrt(7)) / 2
+    v = sign(mpc(3,sqrt(7)-4))
+    k1 = 1+2j + (1-sqrt(7))*(s-4)*v/4
+    k2 = mpc(s-1,s) - k1
+    orths = []
+    for i in range(4):
+        for j in range(4):
+            if i == 1 and 1 <= j <= 2:
+                continue
+            x = s-4+i if 3*i+j > 5 else i
+            y = s-4+j if j > 1 else j
+            z = mpc(x,y)
+            orths.append((z,z+1))
+    return (s, orths + [(k1,k1+v), (k1+1j*v,k1+(1+1j)*v), (k2, k2-v), (k2-1j*v, k2-(1+1j)*v)])
+
 def draw_packing(data, outfn, scale=400):
     s, sqsides = data
     res = drawing(scale, (s, s))
