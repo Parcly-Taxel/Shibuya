@@ -64,11 +64,11 @@ def c6():
         m = (cu(a, 0, r, 1) + cu(0, t, 1, r)) / 2
     return (r, [a, b, t, m, conj(t), conj(m)])
 
-def c_rad(n):
-    m = n-1
-    r = 1 / (1 + 2*cospi(fraction(2,m)))
+def c_rad(m, l):
+    f, ur = fraction(2,m), unitroots(m)
+    r = 1 / hypot(l + (l+1)*cospi(f), (1-l%2)*sinpi(f))
     d = 2*cospi(fraction(1,m)) * r
-    return (r, [0] + [d*u for u in unitroots(m)])
+    return (r, [0] + [d*(i+1+ur[1]*j)*u for u in ur for i in range(l) for j in range(l-i)])
 
 def c11():
     with extraprec(100):
@@ -92,17 +92,34 @@ def c12():
     z = 1 + r*o[1]
     return (r, [p*u for p in (1-2*r, 2-1/r, z, conj(z)) for u in o])
 
+def c14():
+    rp = [2048, 23808, 175456, 50396, -518616, -87304, 612268, -20656, -352480, 73423, 91622, -30178, -6690, 1064, 710, 534, -350, 49]
+    bp = [1073741824, -953776340992, 541703638466560, -768938714717296, 1641283971367680, -1775368820106912, 2105397800007576, -1878379494624240, 618214377504648, 108441781045041, -124395482735712, 29544758862944, -362897520256, -814392717056, 80358397952, 6845583360, -1872625664, 108265472]
+    with extraprec(150):
+        r = polyroots(rp)[3]
+        a = sqrt(1 - r*r)
+        b = sqrt(polyroots(bp)[1])
+        p1 = cu(b, a, r, r) + r*1j
+        p2 = (sqrt(r*r - b*b) + r)*1j
+        p3 = cu(cu(0, p1, 1, r), 1j, r, r)
+        ps = [p1, p3]
+        ps += [conj(p) for p in ps] + [a, b, p2]
+        ps += [-p for p in ps]
+    return (r, ps)
+
 def cn(n):
     """Return the best known circle covering of a unit circle
     with the given number of circles."""
     if 7 <= n <= 10:
-        return c_rad(n)
+        return c_rad(n-1, 1)
+    if n%3 == 1 and n >= 19:
+        return c_rad(n//3, 2)
     return eval(f"c{n}()")
 
 def draw_packing(data, outfn, scale=400):
     r, centres = data
     res = drawing(scale, (2,2), (-1,-1))
-    res.add_circle(0, 0, 1.008)
+    res.add_circle(0, 0, 1.008, {"fill": "#1c92cd"})
     res.add_circle(0, 0, 1, {"fill": "#fff"})
     for c in centres:
         res.add_circle(c.real, c.imag, r, {"opacity": "0.1"})
