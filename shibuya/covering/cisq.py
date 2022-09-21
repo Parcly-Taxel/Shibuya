@@ -5,6 +5,26 @@ Cf. https://erich-friedman.github.io/packing/circovsqu
 """
 from mpmath import *
 from shibuya.draw import drawing
+from shibuya.generators import cu
+
+def c2():
+    return (sqrt(5)/4, (0.25+0.5j, 0.75+0.5j))
+
+def c3():
+    return (sqrt(65)/16, [0.25+7j/16, 0.75+7j/16, 0.5+15j/16])
+
+def c4():
+    return (sqrt(1/8), [mpc(x,y)/4 for x in (1,3) for y in (1,3)])
+
+# see https://math.stackexchange.com/q/4533148
+def c5():
+    a = polyroots([64, -144, 209, -196, 154, -92, 21])[0]
+    r = hypot(a,0.5) / 2
+    z1 = cu(0, a, r, r)
+    p = 1 + sqrt((1-a+2*r) * (1-a-2*r))
+    z2 = (a + p) / 2
+    z3 = cu(p, 1j+conj(p), r, r)
+    return (r, [z1, 1j+conj(z1), z2, 1j+conj(z2), z3])
 
 """
 option(prot); LIB "elim.lib";
@@ -35,6 +55,11 @@ def c6():
         centres = [z1, z2, z3, -z1, -z2, -z3]
         centres = [(z+1+1j) / 2 for z in centres]
     return (r, centres)
+
+def c7():
+    r = 1 / (1+sqrt(7))
+    v = mpc(-0.25,(2+sqrt(7))/12)
+    return (r, [0.5+0.5j + 0.5*i + v*j for i in (-1,0,1) for j in (-1,0,1) if i*j > -1])
 
 def cn(n):
     """Return the best known circle covering of a unit square

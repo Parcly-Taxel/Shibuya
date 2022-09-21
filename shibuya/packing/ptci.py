@@ -7,6 +7,7 @@ and http://hydra.nat.uni-magdeburg.de/packing/cci/cci.html
 """
 from mpmath import *
 from shibuya.draw import drawing
+from shibuya.generators import cu
 
 def thas(t):
     """Given t = tan(x/2), return the point on the unit circle
@@ -71,8 +72,28 @@ def p13():
     points = unitroots(10) + [0.35, -0.22+0.32j, -0.22-0.32j]
     return (d, points)
 
+"""
+option(prot); LIB "elim.lib";
+ring r=(0,s),(w,v,u,t,c,b,a,d),dp; minpoly=s2-3;
+ideal I=d2*(1+t2)-4t2,(1-u2)-(s*d/2+a)*(1+u2),2u-d/2*(1+u2),
+        c2+((a-b)/2)^2-d2,
+        ( ((a+b)/2*(1+v2)-(1-v2))^2+(c*(1+v2)-(2v))^2-(d*(1+v2))^2 ) / (1+v2),
+        ( (b*(1+w2)-(1-w2))^2+(2w)^2-(d*(1+w2))^2 ) / (1+w2),
+        v*(1-(t2+2tu))-((2t+u)-t2u),
+        w*(1-(t2+2tv))-((2t+v)-t2v);
+poly pd=elim(I,wvutcba)[1];
+"""
 def p14():
-    pass # TODO
+    tp = [1240029, 8148762, 8444007, -47475396, -98474049, 107193618, 346191165, -99412272, -613361646, 3630420, 586703574, 27276264, -310427154, -4021164, 90370890, -1870128, -13879647, 233874, 1143027, 5436, -48189, -870, 841]
+    with extraprec(100):
+        s = sqrt(3)
+        t = polyroots(tp, extraprec=100)[4] * s
+        d = 2*t / hypot(1,t)
+        zt = thas(t)
+        a = re(sqrt(zt)) - s*d/2
+        c = cu(a, zt**2.5, d, d)
+        b = 2*re(c) - a
+    return (d, [zt**(k/2) for k in range(-9,10,2)] + [a, b, c, conj(c)])
 
 def p15():
     h = 0.5 / tan(pi/5) + 1
