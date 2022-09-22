@@ -5,6 +5,11 @@ Cf. https://erich-friedman.github.io/packing/squinsqu
 from mpmath import *
 from shibuya.draw import drawing
 
+def ptriv(n):
+    """Return the trivial packing of n unit squares in a square."""
+    s = int(ceil(sqrt(n)))
+    return (s, [(mpc(i,j),mpc(i+1,j)) for j in range(s) for i in range(s) if j*s+i < n])
+
 """
 from sympy import *
 a, b, c, s, t = params = symbols("a b c s t")
@@ -53,6 +58,12 @@ def p18():
             z = mpc(x,y)
             orths.append((z,z+1))
     return (s, orths + [(k1,k1+v), (k1+1j*v,k1+(1+1j)*v), (k2, k2-v), (k2-1j*v, k2-(1+1j)*v)])
+
+def pn(n):
+    try:
+        return eval(f"p{n}()")
+    except NameError:
+        return ptriv(n)
 
 def draw_packing(data, outfn, scale=400):
     s, sqsides = data

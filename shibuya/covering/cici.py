@@ -70,6 +70,17 @@ def c_rad(m, l):
     d = 2*cospi(fraction(1,m)) * r
     return (r, [0] + [d*(i+1+ur[1]*j)*u for u in ur for i in range(l) for j in range(l-i)])
 
+"""
+option(prot); LIB "elim.lib";
+ring z=0,(C,B,A,y,x,c,b,a,r),dp;
+ideal I=((1-a-r)/2)^2+A2-r2,((a-b)/2)^2+B2-r2,((b-c)/2)^2+C2-r2,x2+y2-r2,
+        ((1+a+r)/2+x)^2+(A+y)^2-1,((b+1-r)/2+x)^2+(B+A+y)^2-1,((a+c)/2+x)^2+(C+B+y)^2-1,(c+x)^2+y2-1;
+poly p=factorize(elim(I,CBAyxcb)[1])[1][6];
+poly pr=factorize(resultant(p,diff(p,a),a))[1][3];
+pr;
+poly pa=factorize(resultant(p,diff(p,a),r))[1][2];
+pa;
+"""
 def c11():
     with extraprec(100):
         rp = [16, -56, 121, -458, 1709, -1773, -4406, 12770, -4789, -16653, 19746, -5805, -12708, 15406, -5897, 729]
@@ -92,18 +103,29 @@ def c12():
     z = 1 + r*o[1]
     return (r, [p*u for p in (1-2*r, 2-1/r, z, conj(z)) for u in o])
 
+"""
+option(prot); LIB "elim.lib";
+ring z=0,(A,y,x,c,b,a,r),dp;
+ideal I=b2+r2-1,a2+(c-r)^2-r2,((b-a)/2)^2+A2-r2,x2+y2-r2,
+        ((a+b)/2+x)^2+(A+r+y)^2-1,((b-a)/2+x)^2+(A+c+y-1)^2-r2;
+poly p=factorize(elim(I,Ayxcb)[1])[1][5];
+poly pr=factorize(resultant(p,diff(p,a),a))[1][2];
+pr;
+poly pa=factorize(resultant(p,diff(p,a),r))[1][2];
+pa;
+"""
 def c14():
     rp = [2048, 23808, 175456, 50396, -518616, -87304, 612268, -20656, -352480, 73423, 91622, -30178, -6690, 1064, 710, 534, -350, 49]
     bp = [1073741824, -953776340992, 541703638466560, -768938714717296, 1641283971367680, -1775368820106912, 2105397800007576, -1878379494624240, 618214377504648, 108441781045041, -124395482735712, 29544758862944, -362897520256, -814392717056, 80358397952, 6845583360, -1872625664, 108265472]
     with extraprec(150):
         r = polyroots(rp)[3]
-        a = sqrt(1 - r*r)
-        b = sqrt(polyroots(bp)[1])
-        p1 = cu(b, a, r, r) + r*1j
-        p2 = (sqrt(r*r - b*b) + r)*1j
-        p3 = cu(cu(0, p1, 1, r), 1j, r, r)
-        ps = [p1, p3]
-        ps += [conj(p) for p in ps] + [a, b, p2]
+        a = sqrt(polyroots(bp)[1])
+        b = sqrt(1 - r*r)
+        c = (sqrt(r*r - a*a) + r)*1j
+        p1 = cu(a, b, r, r) + r*1j
+        p2 = cu(cu(0, p1, 1, r), 1j, r, r)
+        ps = [p1, p2]
+        ps += [conj(p) for p in ps] + [a, b, c]
         ps += [-p for p in ps]
     return (r, ps)
 
