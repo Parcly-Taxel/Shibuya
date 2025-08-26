@@ -43,10 +43,8 @@ def mcgee(mode=0):
 def holt():
     """Return the unique non-degenerate unit-distance embedding of the Holt graph,
     the smallest half-transitive graph, with D9 symmetry."""
-    def r(i):
-        t = 4*cos(2**i*pi/9)**2
-        return sqrt(polyroots([1, 1-t, t, -t/3])[0])
-    return symmetrise((r(0), -r(1), -r(2)), "C9")
+    r2, r1, r0 = [sqrt(r) for r in polyroots([3, -3, 3-cbrt(9), 2-cbrt(9)])]
+    return symmetrise((r0, -r1, -r2), "C9")
 
 @fixparams_unitdist()
 def gray():
