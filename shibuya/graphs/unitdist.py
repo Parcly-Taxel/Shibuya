@@ -50,7 +50,7 @@ def holt():
 def gray():
     """Return a unit-distance embedding of the Gray graph, the smallest cubic
     edge- but not vertex-transitive graph with LCF [-25, 7, -7, 13, -13, 25]^9."""
-    line = [p+d for p in polyroots([1, 0, -3, 1]) for d in (0, 1)]
+    line = [2*cos(n*pi/9)+d for n in (2, 4, 8) for d in (0, 1)]
     return symmetrise(line, "C9")
 
 def harborth():
