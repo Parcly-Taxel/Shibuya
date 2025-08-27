@@ -93,18 +93,13 @@ def coxeter():
     edges = ring_edges(7, ((0, 0, 2), (1, 1, 3), (3, 3, 1), (0, 2, 0), (1, 2, -3), (2, 3, 0)))
     return (vertices, edges)
 
-@fixparams_unitdist(-1.76, -0.76)
-def tutte8(a, b):
-    z1 = 1.69j
-    z2 = z1 + expj(a)
-    z3 = z2 + sign(-z2)
-    z4 = cu(z1*root(1,5,2), z1*root(1,5,-2))
-    d1 = abs(z3-z4) - 1
-    z5 = z2 + expj(b)
-    z6 = cu(z5*root(1,5,2), z5)
-    d2 = abs(z6-z3*root(1,5,1)) - 1
-    vertices = symmetrise((z1, z2, z3, z4, z5, z6), "C5")
-    return (vertices, (d1, d2))
+def tutte8():
+    """Return a unit-distance embedding of the Tutte 8-cage (F30A)."""
+    a = sqrt(4/sqrt(5) - 7/4) + 3/2
+    b = sqrt(1 - (a-1)**2)
+    c = sqrt(1 - (a-2)**2)
+    vertices = symmetrise((a*1j, (a-1)*1j, (a-2)*1j, (a-3)*1j, b, c), "C5")
+    return all_unit_distances(vertices)
 
 def dyck():
     """Return a unit-distance embedding of the Dyck graph (F32A)."""
