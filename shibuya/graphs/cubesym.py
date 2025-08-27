@@ -62,6 +62,21 @@ def f26a():
     t0 = findroot(lambda t: f26a_vertices(t)[1], 0.2)
     return all_unit_distances(f26a_vertices(t0)[0])
 
+def f26a_grid():
+    """Return a unit-distance embedding of the F26A graph
+    as a subgraph of the 8×7 knight's graph. This was extracted
+    from Mathematica's GraphData."""
+    tour = """..z..q..
+a..xs...
+.yhupwr.
+.b.dgto.
+..fivk.m
+..c.en..
+....j.l."""
+    coords = [divmod(tour.index(chr(0x61 + i)), 9) for i in range(26)]
+    vertices = [mpc(j/sqrt(5), i/sqrt(5)) for (i,j) in coords]
+    return (vertices, lcf_edges(26, [7, -7]))
+
 def coxeter():
     """Return a unit-distance embedding of the Coxeter graph (F28A)."""
     u7 = unitroots(7)
