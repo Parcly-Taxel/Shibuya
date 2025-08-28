@@ -449,29 +449,31 @@ def f80a(t=1.39):
     edges = ring_edges(20, ((0, 0, 7), (0, 1, 0), (2, 1, 0), (2, 1, 2), (2, 3, 0), (3, 3, 3)))
     return (vertices, edges)
 
-def f84a_vertices(p2, a, b, c):
+def f84a_vertices(a, b, c, d):
     u7 = unitroots(7)
-    p0 = star_radius(7)
-    p1 = p0 + 1
-    p3 = p2 + 1 # has a sign variation
-    p4 = cu(p2, u7[3]*p1)
-    p5 = mpc(a, 0.5)
-    p6 = mpc(b, 0.5)
-    p7 = mpc(c, 0.5)
-    d1 = abs(p3 - u7[4]*p5)**2 - 1
-    d2 = abs(p4 - u7[2]*p7)**2 - 1
-    d3 = abs(p5 - u7[4]*conj(p6))**2 - 1
-    d4 = abs(p6 - u7[-1]*p7)**2 - 1
-    vertices = [u*p for u in u7 for p in (p0, p1, p2, p3, p4, p5, p6, p7)]
-    vertices.extend([u*conj(p) for u in u7 for p in (p4, p5, p6, p7)])
-    vertices = list(map(lambda z: z*1j, vertices))
+    pz_ = -star_radius(7)
+    pz = pz_ - 1
+    pa = mpc(a, 0.5)
+    pa_ = mpc(a, -0.5)
+    pb = mpc(b, 0.5)
+    pb_ = mpc(b, -0.5)
+    pc = mpc(c, 0.5)
+    pc_ = mpc(c, -0.5)
+    pd = d
+    pd_ = d + 1
+    pr = circumcentre(pz, u7[3]*pd, u7[1]*pb) # negative y-coord
+    pr_ = conj(pr)
+    d1 = abs(pa - u7[4]*pc_) - 1
+    d2 = abs(pa - u7[3]*pd_) - 1
+    d3 = abs(pb - u7[6]*pc_) - 1
+    d4 = abs(pr - pz) - 1
+    vertices = [u*p for u in u7 for p in (pz, pz_, pa, pa_, pb, pb_, pc, pc_, pd, pd_, pr, pr_)]
     return (vertices, (d1, d2, d3, d4))
 
 def f84a():
-    """Return a unit-distance embedding of the F84A graph - not degenerate
-    despite its looks. The graph is notable in having the simple PSL(2,8)
-    as its automorphism group."""
-    t0 = findroot(lambda *t: f84a_vertices(*t)[1], (-0.46, -1.44, 0.25, 0.75))
+    """Return a unit-distance embedding of the F84A graph,
+    notable for having the simple PSL(2,8) as its automorphism group."""
+    t0 = findroot(lambda *t: f84a_vertices(*t)[1], (-1.4, -0.07, 0.22, 1.47))
     return all_unit_distances(f84a_vertices(*t0)[0])
 
 def f86a_vertices(*params):

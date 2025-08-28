@@ -137,7 +137,10 @@ def embedding_conclasses(edges, sym, gap_path):
     for chunk in proc.stdout.split("\n\n"):
         if not chunk:
             continue
-        chunk = eval(chunk)
+        try:
+            chunk = eval(chunk)
+        except SyntaxError:
+            continue
         chunk.append(indexer)
         chunks.append(chunk)
     return chunks
