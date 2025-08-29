@@ -4,24 +4,26 @@ Cubic symmetric graphs. Most of the embeddings realised here were taken from Mat
 from mpmath import *
 from functools import reduce
 from shibuya.generators import (cu, star_radius, ring_edges, lcf_edges,
-        all_unit_distances, circumcentre, fixparams_unitdist, symmetrise)
+        all_unit_distances, circumcentre, fixparams_unitdist, symmetrise, remove_edges)
 
 # F4A = tetrahedron() or complete(4) (not unit-distance)
 # F6A = circulant(6, (1, 3)) or mobiusladder(3) (not unit-distance)
 # F8A = genpetersen("cube")
 # F10A = genpetersen("petersen")
 
+@remove_edges(lambda e: e in [(1, 8), (2, 11), (4, 9)])
 def heawood():
-    """Return the symmetric unit-distance embedding of the Heawood graph (F14A)
-    tucked away in Mathematica's GraphData."""
-    P = [10485760, 78643200, 263192576, 543686656, 812777472, 942080000, 843317248, 552468480, 208879616, -31170560, -99213312, -76779520, -32795648, 7878144, 17269760, 16256512, 11392032, 4836080, 3014064, 361320, 69498, -165789]
-    v0 = findroot(lambda v: polyval(P, v), 0.275)
-    p0 = mpc(0.5, v0)
-    p1 = mpc(sqrt(1-(v0+0.5)**2)-0.5, -0.5)
-    p2 = cu(p0, -p0)
-    p3 = cu(p1, -p1)
-    p4 = cu(p2, p3)
-    vertices = [mpc(s*re(v), im(v)) for s in (1, -1) for v in (p0, -p0, p1, -p1, p2, p3, p4)]
+    """Return a dihedrally symmetric unit-distance embedding of the Heawood graph (F14A)."""
+    p0 = 0.5j
+    p1 = 1+0.5j
+    c = polyroots([2, 0, 3, 1])[0]
+    p2 = c+0.5j
+    p3 = cu(p2, p1)
+    p4 = p3-1j
+    p5 = p4-c
+    p6 = 1-c+0.5j
+    vertices = [p0, p1, p2, p3, p4, p5, p6]
+    vertices += [conj(p) for p in vertices]
     return all_unit_distances(vertices)
 
 # F16A = genpetersen("mobiuskantor")
@@ -197,6 +199,7 @@ def f48a():
     edges = ring_edges(12, ((0, 1, 0), (0, 1, -1), (0, 2, 0), (1, 3, 0), (2, 3, 2), (2, 3, -3)))
     return (vertices, edges)
 
+@remove_edges(lambda e: e[0] % 5 == e[1] % 5 == 1)
 def f50a():
     """Return a unit-distance embedding of the F50A graph."""
     u5 = unitroots(5)
@@ -210,8 +213,7 @@ def f50a():
     vertices = [phi, 1/phi, q, pt, pc]
     vertices += [-conj(v) for v in vertices]
     vertices = [u*v for u in u5 for v in vertices]
-    edges = [e for e in all_unit_distances(vertices)[1] if e[0] % 5 != 1 or e[1] % 5 != 1]
-    return (vertices, edges)
+    return all_unit_distances(vertices)
 
 def f54a_vertices(t):
     u18 = unitroots(18)
