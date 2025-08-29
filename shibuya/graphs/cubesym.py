@@ -410,6 +410,7 @@ def f74a():
 
 @fixparams_unitdist(-1.1, 1.6, 2.2)
 def f78a(a, b, c):
+    """Return a unit-distance embedding of the F78A graph."""
     u = unitroots(13)
     pa = mpc(a, 0.5)
     pb = mpc(b, 0.5)
@@ -434,7 +435,10 @@ def f80a(t=1.39):
     edges = ring_edges(20, ((0, 0, 7), (0, 1, 0), (2, 1, 0), (2, 1, 2), (2, 3, 0), (3, 3, 3)))
     return (vertices, edges)
 
-def f84a_vertices(a, b, c, d):
+@fixparams_unitdist(-1.4, -0.07, 0.22, 1.47)
+def f84a(a, b, c, d):
+    """Return a unit-distance embedding of the F84A graph,
+    notable for having the simple PSL(2,8) as its automorphism group."""
     u7 = unitroots(7)
     pz_ = -star_radius(7)
     pz = pz_ - 1
@@ -454,12 +458,6 @@ def f84a_vertices(a, b, c, d):
     d4 = abs(pr - pz) - 1
     vertices = [u*p for u in u7 for p in (pz, pz_, pa, pa_, pb, pb_, pc, pc_, pd, pd_, pr, pr_)]
     return (vertices, (d1, d2, d3, d4))
-
-def f84a():
-    """Return a unit-distance embedding of the F84A graph,
-    notable for having the simple PSL(2,8) as its automorphism group."""
-    t0 = findroot(lambda *t: f84a_vertices(*t)[1], (-1.4, -0.07, 0.22, 1.47))
-    return all_unit_distances(f84a_vertices(*t0)[0])
 
 def f86a_vertices(*params):
     u6 = unitroots(6)
