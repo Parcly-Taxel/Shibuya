@@ -8,7 +8,7 @@ class drawing:
             canvas = (1, 1)
         if offset is None: # (x, y)
             offset = (0, 0)
-        self.root = ET.Element("svg", {"width": str(canvas[0]*scale), "height": str(canvas[1]*scale),
+        self.root = ET.Element("svg", {"xmlns": "http://www.w3.org/2000/svg", "width": str(canvas[0]*scale), "height": str(canvas[1]*scale),
                 "viewBox": f"{offset[0]*scale} {-(offset[1]+canvas[1])*scale} {canvas[0]*scale} {canvas[1]*scale}"})
         self.tree = ET.ElementTree(self.root)
 
