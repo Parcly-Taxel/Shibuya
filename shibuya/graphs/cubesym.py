@@ -11,18 +11,13 @@ from shibuya.generators import (cu, star_radius, ring_edges, lcf_edges,
 # F8A = genpetersen("cube")
 # F10A = genpetersen("petersen")
 
-@remove_edges(lambda e: e in [(1, 8), (2, 11), (4, 9)])
+@remove_edges(lambda e: e in [(0, 12), (2, 9), (5, 7)])
 def heawood():
     """Return a dihedrally symmetric unit-distance embedding of the Heawood graph (F14A)."""
-    p0 = 0.5j
-    p1 = 1+0.5j
     c = polyroots([2, 0, 3, 1])[0]
-    p2 = c+0.5j
-    p3 = cu(p2, p1)
-    p4 = p3-1j
-    p5 = p4-c
-    p6 = 1-c+0.5j
-    vertices = [p0, p1, p2, p3, p4, p5, p6]
+    vertices = [(c, 0.5), (0, 0.5), (1, 0.5), (1-c, 0.5),
+            ((1+c)/2, c*c-c/2+1), ((1+c)/2, c*c-c/2), ((1-c)/2, c*c-c/2)]
+    vertices = [mpc(x, y) for (x, y) in vertices]
     vertices += [conj(p) for p in vertices]
     return all_unit_distances(vertices)
 
