@@ -258,30 +258,18 @@ def f56a():
     vertices = [u*p for u in u14 for p in (pa, pb, pac, pbc)]
     return all_unit_distances(vertices)
 
-def klein(a1=4.47, a2=2.42, a3=0.7, s1=1, s2=-1):
+@fixparams_unitdist(2.5)
+def klein(a):
     """Return a unit-distance embedding of the cubic Klein graph (F56B)."""
-    u7 = unitroots(7)
-    z0 = star_radius(7)
-    r0 = [z0*u for u in u7]
-    z1 = z0 + expj(a1)
-    z2 = z1 + expj(a2)
-    z3 = z1 + expj(a3)
-    r1 = [z1*u for u in u7]
-    r2 = [z2*u for u in u7]
-    r3 = [z3*u for u in u7]
-    z4 = cu(*(r2[2], r3[0])[::s1])
-    z5 = cu(*(r2[0], r3[1])[::s2])
-    r4 = [z4*u for u in u7]
-    r5 = [z5*u for u in u7]
-    z6 = cu(0, r4[0], star_radius(7, 2), 1)
-    z7 = cu(0, r5[0], star_radius(7, 3), 1)
-    r6 = [z6*u for u in u7]
-    r7 = [z7*u for u in u7]
-    vertices = r0 + r1 + r2 + r3 + r4 + r5 + r6 + r7
-    edges = ring_edges(7, ((0, 0, 1), (0, 1, 0), (1, 2, 0), (1, 3, 0),
-                           (2, 4, -2), (3, 4, 0), (2, 5, 0), (3, 5, -1),
-                           (4, 6, 0), (5, 7, 0), (6, 6, 2), (7, 7, 3)))
-    return (vertices, edges)
+    u8 = unitroots(8)
+    z0 = mpc(1.5, -0.5)
+    z1 = mpc(1.5, 0.5)
+    z2 = mpc(1.5, 1.5)
+    z3 = z1 + expj(a)
+    z4 = cu(z3, u8[3]*z0)
+    z5 = cu(z3, u8[3]*z4)
+    z6 = cu(0, z2, star_radius(8))
+    return (symmetrise((z0, z1, z2, z3, z4, z5, z6), "C8"), (abs(z5)-0.5,))
 
 def f56c():
     """Return a unit-distance embedding of the F56C graph,
