@@ -330,22 +330,21 @@ def f62a():
     t0 = findroot(lambda *t: f62a_vertices(*t)[1], t0)
     return all_unit_distances(f62a_vertices(*t0)[0])
 
-def f64a_vertices(a, b):
-    u8 = unitroots(8)
-    p1 = mpc(a, 0.5)
-    p2 = mpc(b, 0.5)
-    p3 = cu(u8[3]*p1, conj(p2), 2, 1)
-    p4 = (u8[3]*p1 + p3) / 2
-    d1 = abs(u8[1]*p3 - p4)**2 - 1
-    d2 = abs(p1 - u8[1]*conj(p2))**2 - 1
-    vertices = [u*p for u in u8 for p in (p1, p2, p3, p4)]
-    vertices += [conj(p) for p in vertices]
-    return vertices, (d1, d2)
-
+@remove_edges(lambda e: e in [(0, 50), (1, 49), (2, 48), (3, 55), (4, 54), (5, 53), (6, 52), (7, 51),
+                              (16, 34), (17, 33), (18, 32), (19, 39), (20, 38), (21, 37), (22, 36), (23, 35),
+                              (8, 22), (9, 23), (10, 16), (11, 17), (12, 18), (13, 19), (14, 20), (15, 21),
+                              (40, 54), (41, 55), (42, 48), (43, 49), (44, 50), (45, 51), (46, 52), (47, 53)])
 def f64a():
     """Return a unit-distance embedding of the F64A graph."""
-    t0 = findroot(lambda *t: f64a_vertices(*t)[1], (0.53, 1.6))
-    return all_unit_distances(f64a_vertices(*t0)[0])
+    a = -0.5 + sqrt(0.5)
+    b = 0.5 + sqrt(0.5) - sqrt(0.5 + sqrt(0.5))
+    c = -0.5 + sqrt(0.5 + sqrt(0.5))
+    d = sqrt(1 + sqrt(2)) / 2 + sqrt(-3*sqrt(2) + 2*sqrt(7 + 5*sqrt(2))) / 2
+    v0 = mpc(a, b)
+    v1 = v0 + 1
+    v2 = mpc(c, 0.5)
+    v3 = mpc(d, 0.5)
+    return all_unit_distances(symmetrise((v0, v1, v2, v3), "D8"))
 
 def f72a_vertices(t):
     u24 = unitroots(24)
