@@ -508,20 +508,30 @@ def foster_old():
                             (0, 5, -2), (2, 3, -6), (4, 1, -2)))
     return (vertices, edges)
 
-def f96a_vertices(a):
-    u12 = unitroots(12)
-    p1 = a+0.5j
-    p2 = 2.3+0.5j
-    p3 = cu(u12[-1]*p1, p2) # ring 3
-    p4 = cu(p2, u12[1]*p1) # ring 2
-    vertices = [u*p for u in u12 for p in (p1, p2, p3, p4)]
-    vertices.extend([conj(p) for p in vertices])
-    return (vertices, abs(p3 - u12[3]*conj(p4)) - 1)
-
-def f96a():
+@remove_edges(lambda e: e in [(2*i, 2*i+13) for i in range(6)] or e in [(2*i+1, 2*i+12) for i in range(6)])
+@fixparams_unitdist(3.12)
+def f96a(c):
     """Return a unit-distance embedding of the F96A graph."""
-    a0 = findroot(lambda a: f96a_vertices(a)[1], 0.7)
-    return all_unit_distances(f96a_vertices(a0)[0])
+    u48 = unitroots(48)
+    r0 = [u48[2*i+1]*star_radius(24, 11) for i in range(24)]
+    z1 = cu(r0[1], r0[-1])
+    r1 = [u48[2*i]*z1 for i in range(24)]
+    """
+    l2 = [[   1,    0,   0,    0],
+          [  -4,   -1,  -2,   -1],
+          [  37,  -13,  20,   -7],
+          [ -56,   30, -36,   22],
+          [1031, -738, 600, -430],
+          [ -20,   -1,  -2,   -9],
+          [ 835, -565, 484, -327]]
+    l1 = [fdot(rcfs, [1, sqrt(2), sqrt(3), sqrt(6)]) for rcfs in l2]
+    c_exact = polyroots(l1)[3] / 2
+    """
+    z2 = mpc(c, 0.5)
+    z3 = cu(z1, conj(z2))
+    d = abs(z3 - u48[4]*conj(z2)) - 1
+    vertices = r0 + r1 + list(symmetrise((z2, z3), "D12"))
+    return (vertices, (d,))
 
 def f96b(a=2.32, b=1.92, c=-0.26, s1=-1, s2=1, s3=1, s4=-1):
     """Return a unit-distance embedding of the F96B graph."""
