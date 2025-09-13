@@ -346,24 +346,19 @@ def f64a():
     v3 = mpc(d, 0.5)
     return all_unit_distances(symmetrise((v0, v1, v2, v3), "D8"))
 
-def f72a_vertices(t):
-    u24 = unitroots(24)
-    u12 = unitroots(12)
-    z0 = star_radius(24, 11)
-    r0 = [u*z0 for u in u24]
-    z1 = star_radius(24, 7) * expj(t)
-    r1 = [u*z1 for u in u24]
-    z2 = cu(r0[0], r1[9])
-    r2 = [u*z2 for u in u12]
-    z3 = cu(r0[15], r1[6])
-    r3 = [u*z3 for u in u12]
-    vertices = r0 + r1 + r2 + r3
-    return (vertices, abs(z2 - z3) - 1)
-
-def f72a():
+@fixparams_unitdist(0.85, 0.35)
+def f72a(t, u):
     """Return a unit-distance embedding of the F72A graph."""
-    t0 = findroot(lambda t: f72a_vertices(t)[1], 2.2)
-    return all_unit_distances(f72a_vertices(t0)[0])
+    u12 = unitroots(12)
+    v0 = t
+    v1 = rect(u, 7*pi/12)
+    d1 = abs(v0 - v1) - 1
+    v2 = 2*v0 - v1
+    v3 = 3*v0 - 2*v1
+    v4 = cu(v3, u12[1]*v3)
+    v5 = circumcentre(-v1, v4, u12[-1]*v2)
+    d2 = abs(v1 + v5) - 1
+    return (symmetrise((v0, v1, v2, v3, v4, v5), "C12"), (d1, d2))
 
 def f74a_vertices(*params):
     u6 = unitroots(6)
