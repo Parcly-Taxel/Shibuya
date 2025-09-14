@@ -533,30 +533,20 @@ def f96a(c):
     vertices = r0 + r1 + list(symmetrise((z2, z3), "D12"))
     return (vertices, (d,))
 
-def f96b(a=2.32, b=1.92, c=-0.26, s1=-1, s2=1, s3=1, s4=-1):
+def f96b():
     """Return a unit-distance embedding of the F96B graph."""
     u12 = unitroots(12)
-    z2 = star_radius(12, 5)
-    r2 = [u*z2 for u in u12]
-    z3 = z2 + expj(a)
-    r3 = [u*z3 for u in u12]
-    z1 = z3 + expj(b)
-    r1 = [u*z1 for u in u12]
-    z4 = cu(*(u12[3]*z1, z3)[::s1])
-    r4 = [u*z4 for u in u12]
-    z5 = z1 + expj(c)
-    r5 = [u*z5 for u in u12]
-    z6 = cu(*(u12[-5]*z5, z4)[::s2])
-    r6 = [u*z6 for u in u12]
-    z8 = cu(*(u12[-4]*z6, z5)[::s3])
-    r8 = [u*z8 for u in u12]
-    z7 = cu(z8, 0, 1, star_radius(12)) if s4 == 1 else cu(0, z8, star_radius(12), 1)
-    r7 = [u*z7 for u in u12]
-    vertices = r1 + r2 + r3 + r4 + r5 + r6 + r7 + r8
-    edges = ring_edges(12, ((1, 1, 5), (1, 2, 0), (2, 0, 0), (3, 0, 3),
-                            (3, 2, 0), (4, 0, 0), (5, 4, -5), (5, 3, 0),
-                            (7, 5, -4), (7, 4, 0), (6, 7, 0), (6, 6, 1)))
-    return (vertices, edges)
+    ti = 5/8
+    v0 = mpc(ti, 0.5)
+    v0_ = mpc(-0.5, -ti)
+    vi = cu(v0, v0_)
+    vj = cu(vi, 0, 1, star_radius(12, 5))
+    v0r = u12[10]*v0
+    v1 = mpc(v0r.real + sqrt(1 - (v0r.imag + 0.5)**2), -0.5)
+    v1_ = conj(v1)
+    v2 = cu(v1_, u12[3]*v1)
+    vo = cu(0, v2, star_radius(12))
+    return all_unit_distances(symmetrise((v0, v0_, vi, vj, v1, v1_, v2, vo), "C12"))
 
 @fixparams_unitdist(1.43, 2.28)
 def f98a(a, b):
