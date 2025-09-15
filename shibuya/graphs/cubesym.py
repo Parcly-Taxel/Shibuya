@@ -561,23 +561,18 @@ def f98a(a, b):
     cons = (abs(p3 - conj(p6)) - 1, abs(p4 - conj(p5)) - 1)
     return (symmetrise((p1, p2, p3, p4, p5, p6, p7), "D7"), cons)
 
-@fixparams_unitdist(3.2, -2.5, 2.7, -2.7, -3.2)
-def f98b(a, b, c, d, e):
-    u = root(1, 7, 1)
-    z1 = 3.175+0.5j
-    z2 = z1+expj(a)
-    z3 = z1+expj(b)
-    z4 = z3+expj(c)
-    z5 = z3+expj(d)
-    z6 = z4+expj(e)
-    z7 = -0.0375+0.5j
-    cons = (abs(z2 - conj(z2)*u) - 1,
-            abs(z2 - z5*u) - 1,
-            abs(z4 - z7/u**2) - 1,
-            abs(z5 - z6/u) - 1,
-            abs(z6 - conj(z7)/u) - 1)
-    vertices = symmetrise((z1, z2, z3, z4, z5, z6, z7), "D7")
-    return (vertices, cons)
+@fixparams_unitdist(0.27)
+def f98b(t):
+    """Return a unit-distance embedding of the F98B graph."""
+    u7 = unitroots(7)
+    v0 = mpc(0.08, 0.5)
+    v1 = u7[2]*v0 + 1
+    v2 = cu(u7[6]*v0, conj(v1))
+    v3 = v1 + expj(t)
+    v4 = cu(u7[1]*conj(v2), v3)
+    v5 = mpc(v3.real + sqrt(1 - (v3.imag + 0.5)**2), -0.5)
+    v6 = cu(v5, u7[6]*v4)
+    return (symmetrise((v0, v1, v2, v3, v4, v5, v6), "D7"), ((u7[4]*v6).imag + 0.5,))
 
 def biggssmith():
     """Return a unit-distance embedding of the Biggs–Smith graph (F102A)."""
