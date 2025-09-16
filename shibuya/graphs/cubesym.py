@@ -548,18 +548,21 @@ def f96b():
     vo = cu(0, v2, star_radius(12))
     return all_unit_distances(symmetrise((v0, v0_, vi, vj, v1, v1_, v2, vo), "C12"))
 
-@fixparams_unitdist(1.43, 2.28)
-def f98a(a, b):
-    r = root(1,7,1)
-    p1 = 1.2+0.5j
-    p7 = 2.3+0.5j
-    p3 = mpc(a, -0.5)*sqrt(r)
-    p6 = cu(conj(p7)*r, p1)
-    p2 = (p1+expj(b))/r
-    p4 = conj(cu(p2, p3/r))
-    p5 = conj(cu(p2, p7))*r
-    cons = (abs(p3 - conj(p6)) - 1, abs(p4 - conj(p5)) - 1)
-    return (symmetrise((p1, p2, p3, p4, p5, p6, p7), "D7"), cons)
+@fixparams_unitdist(3)
+def f98a(t):
+    """Return a unit-distance embedding of the F98A graph."""
+    u7 = unitroots(7)
+    h = -0.75
+    v0 = mpc(h, 0.5)
+    v1 = mpc(h, 1.5)
+    v1r = u7[1]*v1
+    v2 = mpc(v1r.real - sqrt(1 - (v1r.imag + 0.5)**2), -0.5)
+    v1s = u7[5]*v1
+    v3 = mpc(v1s.real + sqrt(1 - (v1s.imag + 0.5)**2), 0.5)
+    v4 = v0 + expj(t)
+    v5 = cu(v4, u7[2]*v3)
+    v6 = cu(u7[5]*v2, v5)
+    return (symmetrise((v0, v1, v2, v3, v4, v5, v6), "D7"), (abs(conj(v6) - u7[1]*v4) - 1,))
 
 @fixparams_unitdist(0.27)
 def f98b(t):
