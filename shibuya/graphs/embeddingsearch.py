@@ -190,7 +190,7 @@ def save_embeddings(E, symtype, gap_path):
     print("end of conjugacy classes")
 
 def load_test_embedding(symtype, cc, k, successes=np.inf, failures=np.inf,
-        coordrange=3, maxsteps=20):
+        coordrange=4, maxsteps=20):
     with np.load(f"{symtype}-{cc}-{k}.npz") as arrd:
         preF, Tmats, Tverts, coord_mat, starts = arrd.values()
         nv = preF.shape[2]
@@ -213,7 +213,6 @@ def load_test_embedding(symtype, cc, k, successes=np.inf, failures=np.inf,
         if np.linalg.norm(F) > 1e-12:
             f += 1
             continue
-        s += 1
         vertices = [None] * Tverts.max()
         for (i, M) in enumerate(Tmats):
             for (j, v) in enumerate(Tverts[i]):
@@ -222,6 +221,7 @@ def load_test_embedding(symtype, cc, k, successes=np.inf, failures=np.inf,
                 C = coord_mat[:,sl]
                 if vertices[v-1] is None:
                     vertices[v-1] = M @ C @ coords @ [1, 1j]
+        s += 1
         yield (x, vertices)
 
 def beauty_factor(G):

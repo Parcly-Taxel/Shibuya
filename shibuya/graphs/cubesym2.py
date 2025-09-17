@@ -7,13 +7,18 @@ from mpmath import *
 from shibuya.generators import (cu, star_radius, fixparams_unitdist,
         symmetrise, remove_edges)
 
-@fixparams_unitdist(0.37, 1.47)
-def f104a(a, b):
+@fixparams_unitdist()
+def f104a():
+    """Return a unit-distance embedding of the F104A graph."""
+    M = [[16, 0, -16, 0, -16, 0, 16],
+             [96, 0, -128, 0, 32, 0],
+         [-8, 0, 104, 0, -24, 0, -8],
+              [-8, 0, -32, 0, 40, 0],
+             [1, 0, 7, 0, -25, 0, 1]]
+    a, b, _, _ = polyroots([polyval(l, tan(2*pi/13)) for l in M])
     p1 = mpc(a, 0.5)
     p2 = mpc(b, 0.5)
-    d1 = abs(p1 - p2*root(1, 26, 4)) - 1
-    d2 = abs(p2 - p1/root(1, 26, 1)) - 1
-    return (symmetrise((p1, p2), "D26"), (d1, d2))
+    return symmetrise((p1, p2), "D26")
 
 @remove_edges(lambda e: {e[0]//9, e[1]//9} < {0, 2, 4} and e[0]//9 != e[1]//9)
 @fixparams_unitdist(0.18, 3, 3)
